@@ -115,6 +115,8 @@
                                 <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? $activeClass : $navClass }}">Dashboard</a>
                                 <a href="{{ route('admin.reports.validation') }}" class="{{ request()->routeIs('admin.reports.*') ? $activeClass : $navClass }}">Laporan</a>
                                 <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? $activeClass : $navClass }}">Users</a>
+                                <a href="{{ route('reports.create') }}" class="{{ request()->routeIs('reports.create') ? $activeClass : $navClass }}">Buat Laporan</a>
+                                <a href="{{ route('reports.index') }}" class="{{ request()->routeIs('reports.index') ? $activeClass : $navClass }}">Laporan Saya</a>
                                 
                                 <div class="relative" x-data="{ open: false }">
                                     <button @click="open = !open" class="{{ request()->routeIs('admin.categories.*', 'admin.buildings.*', 'admin.rooms.*') ? $activeClass : $navClass }} inline-flex items-center">

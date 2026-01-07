@@ -129,7 +129,13 @@ class ReportController extends Controller
         ]);
 
         $validated['user_id'] = Auth::id();
-        $validated['status'] = 'pending';
+        
+        // Jika Admin atau Petugas yang buat, langsung approved
+        if (in_array(Auth::user()->role, ['admin', 'petugas'])) {
+            $validated['status'] = 'approved';
+        } else {
+            $validated['status'] = 'pending';
+        }
 
         if ($request->hasFile('photo')) {
             $validated['photo'] = $request->file('photo')->store('reports', 'public');
@@ -137,14 +143,19 @@ class ReportController extends Controller
 
         Report::create($validated);
 
-        return redirect()->route('reports.index')->with('success', 'Laporan berhasil dibuat dan menunggu validasi.');
+        $message = $validated['status'] === 'approved' ? 'Laporan berhasil dibuat.' : 'Laporan berhasil dibuat dan menunggu validasi.';
+
+        return redirect()->route('reports.index')->with('success', $message);
     }
 
     public function edit(Report $report)
     {
 
         // PERBAIKAN: Gunakan Policy untuk otorisasi yang fleksibel
-        $this->authorize('update', $report);
+        // Bypass otorisasi jika user adalah Admin atau Petugas
+        if (!in_array(Auth::user()->role, ['admin', 'petugas'])) {
+            $this->authorize('update', $report);
+        }
 
         $categories = Category::all();
         $buildings = Building::with('rooms')->get();
@@ -156,7 +167,9 @@ class ReportController extends Controller
     public function update(Request $request, Report $report)
     {
 
-        $this->authorize('update', $report);
+        if (!in_array(Auth::user()->role, ['admin', 'petugas'])) {
+            $this->authorize('update', $report);
+        }
 
         // Validasi data, sama seperti di method store()
         $validatedData = $request->validate([
@@ -200,7 +213,9 @@ class ReportController extends Controller
      */
     public function show(Report $report)
     {
-        $this->authorize('view', $report);
+        if (!in_array(Auth::user()->role, ['admin', 'petugas'])) {
+            $this->authorize('view', $report);
+        }
 
         $report->load(['user', 'room.building', 'category', 'validator', 'claims.user']);
         return view('reports.show', compact('report'));

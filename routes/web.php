@@ -24,6 +24,7 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.attempt');
 // == AUTHENTICATED ROUTES ==
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::resource('reports', ReportController::class)->except(['destroy']);
 
     // == PROFILE (SHARED BY ALL ROLES) ==
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
@@ -33,7 +34,6 @@ Route::middleware('auth')->group(function () {
     // == PENGGUNA (ROLE: PENGGUNA) ==
     Route::middleware('role:pengguna')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'userDashboard'])->name('dashboard');
-        Route::resource('reports', ReportController::class)->except(['destroy']);
         Route::resource('claims', ClaimController::class)->except(['destroy']);
     });
 

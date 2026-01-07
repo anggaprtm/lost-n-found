@@ -30,6 +30,8 @@
                         <a href="{{ route('reports.public_index') }}" class="nav-link {{ request()->routeIs('reports.public_index') ? 'active' : '' }}">Barang Temuan</a>
                         <a href="{{ route('admin.reports.validation') }}" class="nav-link {{ request()->routeIs('admin.reports.validation') ? 'active' : '' }}">Validasi Laporan</a>
                         <a href="{{ route('admin.claims.validation') }}" class="nav-link {{ request()->routeIs('admin.claims.validation') ? 'active' : '' }}">Validasi Klaim</a>
+                        <a href="{{ route('reports.create') }}" class="nav-link {{ request()->routeIs('reports.create') ? 'active' : '' }}">Buat Laporan</a>
+                        <a href="{{ route('reports.index') }}" class="nav-link {{ request()->routeIs('reports.index') ? 'active' : '' }}">Laporan Saya</a>
                     @endif
                 </div>
             </div>
