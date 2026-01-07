@@ -1,0 +1,33 @@
+/* resources/css/app.css */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ▼▼▼ TAMBAHKAN KODE INI ▼▼▼ */
+@layer components {
+    /* Tombol utama (menggunakan Prussian Blue) */
+    .btn-primary {
+        @apply px-4 py-2 bg-prussian-blue text-white rounded-md font-semibold shadow-md transition-transform transform hover:scale-105;
+    }
+
+    /* Tombol outline/sekunder */
+    .btn-outline {
+        @apply px-4 py-2 bg-transparent border border-gray-400 text-gray-700 rounded-md font-semibold transition-colors hover:bg-gray-100;
+    }
+    
+    /* Tombol untuk aksi hapus */
+    .btn-danger {
+        @apply px-4 py-2 bg-danger text-white rounded-md font-semibold shadow-md transition-transform transform hover:scale-105;
+    }
+
+    /* Anda bisa menambahkan kelas lain di sini */
+}
+<style>
+@layer utilities {
+    @keyframes fade-in-down { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fade-in-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-in-down { animation: fade-in-down 0.6s ease-out forwards; }
+    .animate-fade-in-up { animation: fade-in-up 0.6s ease-out forwards; }
+}
+</style>
