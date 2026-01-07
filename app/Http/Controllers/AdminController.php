@@ -119,80 +119,66 @@ class AdminController extends Controller
     // ==========================================
     public function getTrendData(Request $request)
     {
-        $filter = $request->query('filter', 'monthly'); // default monthly
+        $filter = $request->query('filter', 'monthly');
         $year = date('Y');
 
-        // Tentukan kolom grouping & select berdasarkan filter
+        // Definisi kolom grouping dan sorting
         if ($filter == 'daily') {
             $groupBy = 'dim_waktu.tanggal';
             $selectRaw = 'DATE_FORMAT(dim_waktu.tanggal, "%d %b") as label';
+            $orderBy = 'dim_waktu.tanggal';
         } elseif ($filter == 'weekly') {
             $groupBy = 'dim_waktu.pekan_ke';
             $selectRaw = 'CONCAT("Pekan ", dim_waktu.pekan_ke) as label';
+            $orderBy = 'dim_waktu.pekan_ke';
         } elseif ($filter == 'yearly') {
             $groupBy = 'dim_waktu.tahun';
             $selectRaw = 'dim_waktu.tahun as label';
+            $orderBy = 'dim_waktu.tahun';
         } else { // monthly
-            $groupBy = 'dim_waktu.bulan_angka'; // Group by angka biar urut
+            $groupBy = 'dim_waktu.bulan_angka';
             $selectRaw = 'dim_waktu.bulan_nama as label';
+            $orderBy = 'dim_waktu.bulan_angka';
         }
 
-        // 1. DATA KEHILANGAN (Garis Merah)
-        $lostQuery = DB::table('fact_kehilangan')
-            ->join('dim_waktu', 'fact_kehilangan.waktu_id', '=', 'dim_waktu.id')
-            ->select(DB::raw($selectRaw), DB::raw('SUM(jumlah_laporan_hilang) as total'))
-            ->groupBy(DB::raw($groupBy)); // Group by kolom dinamis
-            
-        // Filter tahun ini (kecuali filter yearly, tampilkan 5 tahun terakhir)
-        if ($filter == 'yearly') {
-             $lostQuery->where('dim_waktu.tahun', '>=', $year - 5);
-        } else {
-             $lostQuery->where('dim_waktu.tahun', $year);
-        }
-        
-        // Handle sorting
-        if ($filter == 'monthly') {
-             // Trik khusus monthly: sertakan bulan_nama di group by
-             $lostQuery->groupBy('dim_waktu.bulan_nama')->orderBy('dim_waktu.bulan_angka');
-        } else {
-             $lostQuery->orderBy(DB::raw($groupBy));
-        }
+        // Helper function untuk query agar lebih rapi dan konsisten
+        $getData = function($table, $sumColumn) use ($year, $filter, $groupBy, $selectRaw, $orderBy) {
+            $query = DB::table($table)
+                ->join('dim_waktu', "$table.waktu_id", '=', 'dim_waktu.id')
+                // Select sort_key juga untuk pengurutan nanti
+                ->select(DB::raw($selectRaw), DB::raw("SUM($sumColumn) as total"), DB::raw("$orderBy as sort_key"))
+                ->groupBy(DB::raw($groupBy));
 
-        $lostData = $lostQuery->get();
+            // Khusus monthly, group by nama bulan juga agar compliant dengan strict SQL mode
+            if ($filter == 'monthly') {
+                $query->groupBy('dim_waktu.bulan_nama');
+            }
 
-        // 2. DATA PENEMUAN (Garis Hijau)
-        // (Logic sama persis, cuma beda tabel sumber)
-        $foundQuery = DB::table('fact_penemuan')
-            ->join('dim_waktu', 'fact_penemuan.waktu_id', '=', 'dim_waktu.id')
-            ->select(DB::raw($selectRaw), DB::raw('SUM(jumlah_barang_masuk) as total'))
-            ->groupBy(DB::raw($groupBy));
+            if ($filter == 'yearly') {
+                $query->where('dim_waktu.tahun', '>=', $year - 5);
+            } else {
+                $query->where('dim_waktu.tahun', $year);
+            }
 
-        if ($filter == 'yearly') {
-             $foundQuery->where('dim_waktu.tahun', '>=', $year - 5);
-        } else {
-             $foundQuery->where('dim_waktu.tahun', $year);
-        }
+            return $query->orderBy(DB::raw($orderBy))->get();
+        };
 
-        if ($filter == 'monthly') {
-             $foundQuery->groupBy('dim_waktu.bulan_nama')->orderBy('dim_waktu.bulan_angka');
-        } else {
-             $foundQuery->orderBy(DB::raw($groupBy));
-        }
+        $lostData = $getData('fact_kehilangan', 'jumlah_laporan_hilang');
+        $foundData = $getData('fact_penemuan', 'jumlah_barang_masuk');
 
-        $foundData = $foundQuery->get();
+        // Gabungkan label dan urutkan berdasarkan sort_key (bukan label string)
+        // Ini mencegah urutan bulan jadi alfabetis (April, Agustus, Desember...)
+        $merged = $lostData->map(fn($item) => ['label' => $item->label, 'sort_key' => $item->sort_key])
+            ->merge($foundData->map(fn($item) => ['label' => $item->label, 'sort_key' => $item->sort_key]))
+            ->unique('label')
+            ->sortBy('sort_key');
 
-        // 3. Gabungkan Data (Merge Labels)
-        // Kita harus memastikan label sumbu X konsisten
-        $labels = $lostData->pluck('label')->merge($foundData->pluck('label'))->unique()->values();
+        $labels = $merged->pluck('label')->values();
 
         // Mapping data supaya urut sesuai label
-        $lostMapped = $labels->map(function($label) use ($lostData) {
-            return $lostData->firstWhere('label', $label)->total ?? 0;
-        });
+        $lostMapped = $labels->map(fn($label) => $lostData->firstWhere('label', $label)->total ?? 0);
+        $foundMapped = $labels->map(fn($label) => $foundData->firstWhere('label', $label)->total ?? 0);
 
-        $foundMapped = $labels->map(function($label) use ($foundData) {
-            return $foundData->firstWhere('label', $label)->total ?? 0;
-        });
 
         return response()->json([
             'labels' => $labels,

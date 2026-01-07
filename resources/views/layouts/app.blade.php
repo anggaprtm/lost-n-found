@@ -232,41 +232,10 @@
                             <svg class="w-8 h-8 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                             <span class="text-xl font-bold text-primary">Lost & Found</span>
                         </div>
-                        <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wide">Project UAS Basis Data SD-A2</h3>
                         <p class="text-xs text-gray-500 mt-2">
                             Sistem Informasi Manajemen Barang Hilang & Temuan<br>
                             Universitas Airlangga &copy; {{ date('Y') }}
                         </p>
-                    </div>
-
-                    <div class="md:text-right">
-                        <h3 class="text-sm font-bold text-primary mb-3 uppercase tracking-wider">Anggota Kelompok</h3>
-                        <ul class="space-y-1 text-xs text-gray-600 font-medium">
-                            <li class="hover:text-primary transition-colors">
-                                <span class="uppercase">Bhtari Divakalyana Putri</span> 
-                                <span class="text-gray-400 mx-1">|</span> 164231015
-                            </li>
-                            <li class="hover:text-primary transition-colors">
-                                <span class="uppercase">Sahda Tadea Teophania</span> 
-                                <span class="text-gray-400 mx-1">|</span> 164231018
-                            </li>
-                            <li class="hover:text-primary transition-colors">
-                                <span class="uppercase">Radam Gumelar</span> 
-                                <span class="text-gray-400 mx-1">|</span> 164231032
-                            </li>
-                            <li class="hover:text-primary transition-colors">
-                                <span class="uppercase">Erlina Agustin</span> 
-                                <span class="text-gray-400 mx-1">|</span> 164231035
-                            </li>
-                            <li class="hover:text-primary transition-colors">
-                                <span class="uppercase">Ni Putu Essa Kirana P</span> 
-                                <span class="text-gray-400 mx-1">|</span> 164231066
-                            </li>
-                            <li class="hover:text-primary transition-colors">
-                                <span class="uppercase">Adrina Firda Marwah</span> 
-                                <span class="text-gray-400 mx-1">|</span> 164231087
-                            </li>
-                        </ul>
                     </div>
 
                 </div>
