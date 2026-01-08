@@ -65,8 +65,10 @@
                             <td class="px-6 py-4">
                                 <div class="flex items-center">
                                     @if($report->photo)
-                                        <img src="{{ Storage::url($report->photo) }}" alt="{{ $report->item_name }}" onerror="this.onerror=null; this.src='https://placehold.co/100x100?text=No+Image'"
-                                             class="w-12 h-12 rounded-lg object-cover mr-4">
+                                        <img src="{{ asset('storage/' . $report->photo) }}" 
+                                                alt="{{ $report->item_name }}" 
+                                                onerror="this.onerror=null; this.src='https://placehold.co/100x100?text=No+Image'"
+                                                class="w-12 h-12 rounded-lg object-cover mr-4">
                                     @else
                                         <div class="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center mr-4">
                                             <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

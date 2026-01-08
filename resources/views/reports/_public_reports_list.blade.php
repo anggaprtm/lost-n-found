@@ -35,7 +35,6 @@
                 <button type="submit" class="btn-primary">Cari</button>
                 <a href="{{ url()->current() }}#temuan" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Reset</a>
                 
-                {{-- JANGAN TARUH TOMBOL KLAIM DI SINI --}}
             </form>
         </div>
 
@@ -162,7 +161,6 @@
     </div>
 </div>
 
-{{-- SCRIPT MODAL (Pastikan jalan) --}}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const claimModal = document.getElementById('claimModal');

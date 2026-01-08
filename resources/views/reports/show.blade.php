@@ -138,6 +138,13 @@
                         Klaim Barang Ini
                     </button>
                 @endif
+                
+                {{-- Tombol Assign (hanya untuk petugas/admin) --}}
+                @if(in_array(auth()->user()->role, ['petugas', 'admin']) && $report->type === 'found' && $report->status === 'approved')
+                    <a href="{{ route('petugas.reports.assign', $report) }}" class="px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50">
+                        Assign ke Pengguna
+                    </a>
+                @endif
 
             </div>
 

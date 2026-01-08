@@ -99,35 +99,89 @@
     </div>
 
     <div class="bg-white rounded-xl shadow-sm p-6 mb-8 border border-gray-100">
-        <h2 class="text-lg font-bold text-gray-900 mb-4">Aktivitas Terbaru</h2>
+        <h2 class="text-lg font-bold text-gray-900 mb-4">Daftar Laporan Operasional</h2>
+
+        {{-- Filter Form --}}
+        <form method="GET" action="{{ route('admin.dashboard') }}" class="mb-4 p-4 bg-gray-50 rounded-lg">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label for="type" class="block text-sm font-medium text-gray-700">Tipe Laporan</label>
+                    <select name="type" id="type" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <option value="">Semua Tipe</option>
+                        <option value="found" {{ request('type') == 'found' ? 'selected' : '' }}>Temuan</option>
+                        <option value="lost" {{ request('type') == 'lost' ? 'selected' : '' }}>Kehilangan</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="status" class="block text-sm font-medium text-gray-700">Status Laporan</label>
+                    <select name="status" id="status" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <option value="">Semua Status</option>
+                        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                        <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Approved</option>
+                        <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Rejected</option>
+                        <option value="returned" {{ request('status') == 'returned' ? 'selected' : '' }}>Returned</option>
+                    </select>
+                </div>
+                <div class="self-end">
+                    <button type="submit" class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Filter</button>
+                </div>
+            </div>
+        </form>
+
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Item</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Pelapor</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Lokasi</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Tipe</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Tanggal</th>
+                        <th class="relative px-4 py-3"></th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 bg-white">
-                    @foreach($recentReports as $report)
+                    @forelse($reports as $report)
                     <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $report->item_name }}</td>
+                        <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ \Illuminate\Support\Str::limit($report->item_name, 30) }}</td>
                         <td class="px-4 py-3 text-sm text-gray-500">{{ $report->user->name }}</td>
-                        <td class="px-4 py-3 text-sm text-gray-500">
-                            {{ $report->room->building->name ?? '-' }} - {{ $report->room->name ?? '' }}
-                        </td>
                         <td class="px-4 py-3">
                             <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                {{ $report->type == 'lost' ? 'bg-red-50 text-secondary border border-red-100' : 'bg-blue-50 text-primary border border-blue-100' }}">
+                                {{ $report->type == 'lost' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' }}">
                                 {{ ucfirst($report->type) }}
                             </span>
                         </td>
+                        <td class="px-4 py-3">
+                            <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                @switch($report->status)
+                                    @case('pending') bg-yellow-100 text-yellow-800 @break
+                                    @case('approved') bg-blue-100 text-blue-800 @break
+                                    @case('rejected') bg-red-100 text-red-800 @break
+                                    @case('returned') bg-purple-100 text-purple-800 @break
+                                @endswitch
+                            ">
+                                {{ ucfirst($report->status) }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-sm text-gray-500">{{ $report->created_at->format('d M Y') }}</td>
+                        <td class="px-4 py-3 text-right text-sm font-medium">
+                            <a href="{{ route('admin.reports.show', $report) }}" class="text-indigo-600 hover:text-indigo-900">Detail</a>
+                        </td>
                     </tr>
-                    @endforeach
+                    @empty
+                    <tr>
+                        <td colspan="6" class="text-center py-8 text-gray-500">
+                            Tidak ada laporan yang cocok dengan filter.
+                        </td>
+                    </tr>
+                    @endforelse
                 </tbody>
             </table>
+        </div>
+
+        {{-- Pagination Links --}}
+        <div class="mt-4">
+            {{ $reports->links() }}
         </div>
     </div>
 

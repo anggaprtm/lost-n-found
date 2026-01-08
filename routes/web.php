@@ -49,6 +49,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/reports/{report}/edit', [PetugasController::class, 'edit'])->name('reports.edit');
         Route::put('/reports/{report}', [PetugasController::class, 'update'])->name('reports.update');
         Route::put('/reports/{report}/validate', [PetugasController::class, 'validateReport'])->name('reports.validate');
+        Route::get('/reports/{report}/assign', [PetugasController::class, 'assignClaim'])->name('reports.assign');
+        Route::post('/reports/{report}/assign', [PetugasController::class, 'storeAssignedClaim'])->name('reports.assign.store');
         Route::delete('/reports/{report}', [ReportController::class, 'destroy'])->name('reports.destroy');
 
         // Claims Management by Petugas
@@ -65,6 +67,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard/trend-data', [AdminController::class, 'getTrendData'])->name('dashboard.trend');
         Route::get('/dashboard/location-details', [AdminController::class, 'getLocationDetails'])->name('dashboard.location-details');
         
+        // Temporary route for fixing data. Please remove after use.
+        Route::get('/fix-report-statuses', [AdminController::class, 'fixReportStatuses'])->name('admin.fix-statuses');
+
         // Validation Pages
         Route::get('/reports/validation', [ReportController::class, 'validationPage'])->name('reports.validation');
         Route::get('/claims/validation', [ClaimController::class, 'validation'])->name('claims.validation');

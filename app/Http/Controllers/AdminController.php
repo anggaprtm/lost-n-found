@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
-    public function dashboard()
+    public function dashboard(Request $request)
     {
         // =================================================================
         // BAGIAN 1: SCORECARDS
@@ -20,8 +20,8 @@ class AdminController extends Controller
         $totalDitemukan = DB::table('fact_penemuan')->sum('jumlah_barang_masuk') ?? 0; // Tambahan: Total Barang Temuan
         
         $stats = [
-            'total_reports'    => $totalHilang,
-            'total_found'      => $totalDitemukan, // Gunakan ini untuk card "Total Ditemukan"
+            'total_reports'    => Report::count(),
+            'total_found'      => Report::where('type','found')->count(),
             'pending_validations' => Report::where('status', 'pending')->count() + Claim::where('status', 'pending')->count(),
             'total_users'      => User::count(),
         ];
@@ -31,7 +31,6 @@ class AdminController extends Controller
         // =================================================================
 
         // A. GRAFIK "TOP 5 LOKASI ANGKER"
-        // Menggunakan kolom 'nama_gedung' sesuai schema kamu
         $topLocations = DB::table('fact_kehilangan')
             ->join('dim_lokasi', 'fact_kehilangan.lokasi_id', '=', 'dim_lokasi.id')
             ->select('dim_lokasi.nama_gedung as name', DB::raw('SUM(jumlah_laporan_hilang) as total'))
@@ -41,7 +40,6 @@ class AdminController extends Controller
             ->get();
 
         // B. GRAFIK KATEGORI
-        // Menggunakan kolom 'nama_kategori' sesuai schema kamu
         $reportsByCategory = DB::table('fact_kehilangan')
             ->join('dim_kategori', 'fact_kehilangan.kategori_id', '=', 'dim_kategori.id')
             ->select('dim_kategori.nama_kategori as name', DB::raw('SUM(jumlah_laporan_hilang) as total'))
@@ -49,49 +47,48 @@ class AdminController extends Controller
             ->get();
 
         // C. GRAFIK TREN BULANAN (REVISI DIM_WAKTU)
-        // Masalah tadi di sini: Ganti 'bulan' jadi 'bulan_nama'
         $monthlyTrend = DB::table('fact_kehilangan')
             ->join('dim_waktu', 'fact_kehilangan.waktu_id', '=', 'dim_waktu.id')
             ->select('dim_waktu.bulan_nama as month', DB::raw('SUM(jumlah_laporan_hilang) as total'))
             ->where('dim_waktu.tahun', date('Y'))
-            // Kita group by bulan_nama DAN bulan_angka biar bisa diurutkan
             ->groupBy('dim_waktu.bulan_nama', 'dim_waktu.bulan_angka')
-            ->orderBy('dim_waktu.bulan_angka') // Urutkan berdasarkan angka (1, 2, 3...)
+            ->orderBy('dim_waktu.bulan_angka')
             ->get();
         
         // E. GRAFIK HARI PALING "SIAL" (Day Analysis)
-        // Hari apa barang paling sering hilang?
         $dayAnalysis = DB::table('fact_kehilangan')
             ->join('dim_waktu', 'fact_kehilangan.waktu_id', '=', 'dim_waktu.id')
-            // Pastikan kolom 'hari_nama' ada di dim_waktu kamu
             ->select('dim_waktu.hari_nama as day', DB::raw('SUM(jumlah_laporan_hilang) as total'))
             ->groupBy('dim_waktu.hari_nama')
-            // Order by field biar urut Senin-Minggu (Opsional, kalau database support FIELD)
             ->orderByRaw("FIELD(dim_waktu.hari_nama, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu')")
             ->get();
 
         // =================================================================
-        // BAGIAN 3: OPERASIONAL
+        // BAGIAN 3: DAFTAR LAPORAN (NEW & IMPROVED)
         // =================================================================
         
-        $recentReports = Report::with(['user', 'category', 'room.building'])
-            ->latest()
-            ->take(5)
-            ->get();
+        $reportsQuery = Report::with(['user', 'category', 'room.building'])
+            ->latest();
 
-        $recentClaims = Claim::with(['user', 'report'])
-            ->latest()
-            ->take(5)
-            ->get();
+        // Filter berdasarkan Tipe (hilang/temuan)
+        if ($request->filled('type')) {
+            $reportsQuery->where('type', $request->type);
+        }
+
+        // Filter berdasarkan Status
+        if ($request->filled('status')) {
+            $reportsQuery->where('status', $request->status);
+        }
+
+        $reports = $reportsQuery->paginate(10)->withQueryString();
 
         return view('admin.dashboard', compact(
             'stats', 
             'topLocations', 
             'reportsByCategory', 
             'monthlyTrend',
-            'dayAnalysis',          // <--- Baru
-            'recentReports', 
-            'recentClaims'
+            'dayAnalysis',
+            'reports'
         ));
     }
     // ==========================================
@@ -186,5 +183,24 @@ class AdminController extends Controller
             ->get();
 
         return response()->json($rooms);
+    }
+
+    public function fixReportStatuses()
+    {
+        // Find all reports that are still 'approved'
+        // but have a claim that is 'approved'.
+        $reportsToFix = Report::where('status', 'approved')
+            ->whereHas('claims', function ($query) {
+                $query->where('status', 'approved');
+            })
+            ->get();
+
+        $count = $reportsToFix->count();
+
+        foreach ($reportsToFix as $report) {
+            $report->update(['status' => 'returned']);
+        }
+
+        return "Fixed {$count} reports that had an approved claim but were not marked as 'returned'. You can now remove the temporary route used to run this fix.";
     }
 }

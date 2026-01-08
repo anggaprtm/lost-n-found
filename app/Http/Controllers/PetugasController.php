@@ -7,6 +7,7 @@ use App\Models\Claim;
 use App\Models\Category;
 use App\Models\Building;
 use App\Models\Room;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -18,28 +19,21 @@ class PetugasController extends Controller
 {
     use AuthorizesRequests;
 
-    public function dashboard()
+    public function dashboard(Request $request)
     {
         $userId = Auth::id();
-        $currentMonth = date('m'); // Hati-hati: ini string "01"-"12"
+        $currentMonth = date('m');
         $currentYear = date('Y');
 
         // =================================================================
         // 1. KPI CARDS
         // =================================================================
-
-        // Card 1: Tugas Menumpuk (Laporan "Found" yg perlu divalidasi/disimpan)
         $pendingTasks = Report::where('status', 'pending')->count();
-
-        // Card 2: Barang Temuan Baru (Bulan Ini)
-        // Kita hitung dari fact_penemuan
         $itemsInMonth = DB::table('fact_penemuan')
             ->join('dim_waktu', 'fact_penemuan.waktu_id', '=', 'dim_waktu.id')
-            ->where('dim_waktu.bulan_angka', (int)$currentMonth) // Cast ke int biar aman
+            ->where('dim_waktu.bulan_angka', (int)$currentMonth)
             ->where('dim_waktu.tahun', $currentYear)
             ->sum('jumlah_barang_masuk') ?? 0;
-
-        // Card 3: Kontribusi Saya (Barang yang berhasil dikembalikan oleh user ini)
         $myPerformance = DB::table('fact_pengembalian')
             ->where('validator_id', $userId)
             ->sum('jumlah_kembali') ?? 0;
@@ -53,17 +47,11 @@ class PetugasController extends Controller
         // =================================================================
         // 2. DATA GRAFIK
         // =================================================================
-
-        // A. STATUS PENYIMPANAN (Doughnut Chart)
-        // Menggambarkan nasib barang temuan: Masih Pending, Disetujui (Disimpan), atau Sudah Kembali
         $warehouseComposition = DB::table('fact_penemuan')
             ->join('dim_status', 'fact_penemuan.status_id', '=', 'dim_status.id')
             ->select('dim_status.label_status as label', DB::raw('COUNT(*) as total'))
             ->groupBy('dim_status.label_status')
             ->get();
-
-        // B. KATEGORI BARANG TEMUAN (Bar Chart)
-        // Apa jenis barang yang paling sering ditemukan?
         $categoryDistribution = DB::table('fact_penemuan')
             ->join('dim_kategori', 'fact_penemuan.kategori_id', '=', 'dim_kategori.id')
             ->select('dim_kategori.nama_kategori as label', DB::raw('SUM(jumlah_barang_masuk) as total'))
@@ -72,27 +60,29 @@ class PetugasController extends Controller
             ->get();
 
         // =================================================================
-        // 3. OPERATIONAL LISTS
+        // 3. DAFTAR LAPORAN (NEW & IMPROVED)
         // =================================================================
+        
+        $reportsQuery = Report::with(['user', 'category', 'room.building'])
+            ->latest();
 
-        $recentReports = Report::with(['category', 'room.building', 'user'])
-            ->where('status', 'pending')
-            ->latest()
-            ->take(5)
-            ->get();
+        // Filter berdasarkan Tipe (hilang/temuan)
+        if ($request->filled('type')) {
+            $reportsQuery->where('type', $request->type);
+        }
 
-        $recentClaims = Claim::with(['report.category', 'user'])
-            ->where('status', 'pending')
-            ->latest()
-            ->take(5)
-            ->get();
+        // Filter berdasarkan Status
+        if ($request->filled('status')) {
+            $reportsQuery->where('status', $request->status);
+        }
+
+        $reports = $reportsQuery->paginate(10)->withQueryString();
 
         return view('petugas.dashboard', compact(
             'stats', 
             'warehouseComposition', 
             'categoryDistribution', 
-            'recentReports', 
-            'recentClaims'
+            'reports'
         ));
     }
 
@@ -309,5 +299,44 @@ class PetugasController extends Controller
         $report->update($validatedData);
 
         return redirect()->route('petugas.reports')->with('success', 'Laporan berhasil diperbarui.');
+    }
+
+    public function assignClaim(Report $report)
+    {
+        // Pastikan hanya barang temuan yang sudah divalidasi (tersimpan) yang bisa di-assign
+        if ($report->type !== 'found' || $report->status !== 'approved') {
+            return redirect()->route('petugas.reports.show', $report)->with('error', 'Hanya barang temuan yang sudah disetujui yang dapat di-assign.');
+        }
+
+        $users = User::where('role', 'pengguna')->orderBy('name')->get();
+
+        return view('petugas.reports.assign', compact('report', 'users'));
+    }
+
+    public function storeAssignedClaim(Request $request, Report $report)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        // Double check, just in case
+        if ($report->type !== 'found' || $report->status !== 'approved') {
+            return redirect()->route('petugas.reports.show', $report)->with('error', 'Hanya barang temuan yang sudah disetujui yang dapat di-assign.');
+        }
+
+        // Buat klaim langsung dengan status 'approved'
+        $claim = Claim::create([
+            'report_id'   => $report->id,
+            'user_id'     => $request->user_id,
+            'description' => 'Klaim di-assign langsung oleh petugas.',
+            'status'      => 'approved', // Langsung approved
+            'validator_id'=> auth()->id(), // Petugas yang login adalah validatornya
+            'claim_date'  => now(),
+        ]);
+
+        // Observer `ClaimObserver` akan otomatis men-trigger perubahan status report menjadi `returned`
+        // dan juga mengisi `fact_pengembalian`.
+
+        return redirect()->route('petugas.reports.show', $report)->with('success', 'Barang berhasil di-assign kepada pengguna dan statusnya kini telah dikembalikan.');
     }
 }

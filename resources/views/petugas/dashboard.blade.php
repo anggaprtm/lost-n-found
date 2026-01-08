@@ -98,57 +98,89 @@
         </div>
 
         <div class="lg:col-span-2 bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-bold text-gray-900">🔔 Tugas Menunggu</h2>
-                <div class="flex space-x-2">
-                    <a href="{{ route('petugas.reports') }}" class="text-xs bg-blue-50 text-primary px-3 py-1 rounded-lg hover:bg-blue-100 font-medium transition">Laporan</a>
-                    <a href="{{ route('petugas.claims') }}" class="text-xs bg-purple-50 text-purple-700 px-3 py-1 rounded-lg hover:bg-purple-100 font-medium transition">Klaim</a>
+            <h2 class="text-lg font-bold text-gray-900 mb-4">Daftar Laporan Operasional</h2>
+
+            {{-- Filter Form --}}
+            <form method="GET" action="{{ route('petugas.dashboard') }}" class="mb-4 p-4 bg-gray-50 rounded-lg">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label for="type" class="block text-sm font-medium text-gray-700">Tipe Laporan</label>
+                        <select name="type" id="type" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                            <option value="">Semua Tipe</option>
+                            <option value="found" {{ request('type') == 'found' ? 'selected' : '' }}>Temuan</option>
+                            <option value="lost" {{ request('type') == 'lost' ? 'selected' : '' }}>Kehilangan</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="status" class="block text-sm font-medium text-gray-700">Status Laporan</label>
+                        <select name="status" id="status" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                            <option value="">Semua Status</option>
+                            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                            <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Approved</option>
+                            <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Rejected</option>
+                            <option value="returned" {{ request('status') == 'returned' ? 'selected' : '' }}>Returned</option>
+                        </select>
+                    </div>
+                    <div class="self-end">
+                        <button type="submit" class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Filter</button>
+                    </div>
                 </div>
+            </form>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Item</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Pelapor</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Tipe</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Tanggal</th>
+                            <th class="relative px-4 py-3"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 bg-white">
+                        @forelse($reports as $report)
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ \Illuminate\Support\Str::limit($report->item_name, 30) }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-500">{{ $report->user->name }}</td>
+                            <td class="px-4 py-3">
+                                <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                    {{ $report->type == 'lost' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' }}">
+                                    {{ ucfirst($report->type) }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3">
+                                <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                    @switch($report->status)
+                                        @case('pending') bg-yellow-100 text-yellow-800 @break
+                                        @case('approved') bg-blue-100 text-blue-800 @break
+                                        @case('rejected') bg-red-100 text-red-800 @break
+                                        @case('returned') bg-purple-100 text-purple-800 @break
+                                    @endswitch
+                                ">
+                                    {{ ucfirst($report->status) }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-500">{{ $report->created_at->format('d M Y') }}</td>
+                            <td class="px-4 py-3 text-right text-sm font-medium">
+                                <a href="{{ route('petugas.reports.show', $report) }}" class="text-indigo-600 hover:text-indigo-900">Detail</a>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="6" class="text-center py-8 text-gray-500">
+                                Tidak ada laporan yang cocok dengan filter.
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
 
-            <div class="space-y-3">
-                @foreach($recentReports as $report)
-                <div class="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg hover:border-red-300 hover:shadow-sm transition group">
-                    <div class="flex items-center space-x-3">
-                        <div class="bg-red-50 p-2 rounded-lg text-secondary group-hover:bg-secondary group-hover:text-white transition">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                        </div>
-                        <div>
-                            <p class="text-sm font-bold text-gray-900">Laporan Baru: {{ $report->item_name }}</p>
-                            <p class="text-xs text-gray-500">Oleh {{ $report->user->name }} • {{ $report->created_at->diffForHumans() }}</p>
-                        </div>
-                    </div>
-                    <a href="{{ route('petugas.reports') }}" class="text-xs font-semibold text-secondary bg-red-50 px-3 py-1.5 rounded-md hover:bg-secondary hover:text-white transition">
-                        Validasi
-                    </a>
-                </div>
-                @endforeach
-
-                @foreach($recentClaims as $claim)
-                <div class="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg hover:border-purple-300 hover:shadow-sm transition group">
-                    <div class="flex items-center space-x-3">
-                        <div class="bg-purple-50 p-2 rounded-lg text-purple-700 group-hover:bg-purple-600 group-hover:text-white transition">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                        </div>
-                        <div>
-                            <p class="text-sm font-bold text-gray-900">Klaim Masuk: {{ $claim->report->item_name }}</p>
-                            <p class="text-xs text-gray-500">Oleh {{ $claim->user->name }} • {{ $claim->created_at->diffForHumans() }}</p>
-                        </div>
-                    </div>
-                    <a href="{{ route('petugas.claims') }}" class="text-xs font-semibold text-purple-700 bg-purple-50 px-3 py-1.5 rounded-md hover:bg-purple-600 hover:text-white transition">
-                        Proses
-                    </a>
-                </div>
-                @endforeach
-
-                @if($recentReports->isEmpty() && $recentClaims->isEmpty())
-                <div class="text-center py-8">
-                    <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-50 mb-3">
-                        <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                    </div>
-                    <p class="text-sm text-gray-500">Tidak ada antrean validasi saat ini. Aman! 👍</p>
-                </div>
-                @endif
+            {{-- Pagination Links --}}
+            <div class="mt-4">
+                {{ $reports->links() }}
             </div>
         </div>
     </div>
