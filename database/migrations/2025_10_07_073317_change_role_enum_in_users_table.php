@@ -28,7 +28,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             // Mengembalikan ke kondisi semula jika migrasi di-rollback
-            $table->enum('role', ['admin', 'petugas', 'mahasiswa'])->default('mahasiswa')->change();
+            $table->enum('role', ['admin', 'petugas', 'pengguna'])->default('pengguna')->change();
         });
     }
 };

@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Report;
 use App\Models\Category;
 use App\Models\Building;
+use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
@@ -189,10 +192,8 @@ class ReportController extends Controller
                 Storage::disk('public')->delete($report->photo);
             }
 
-            $validatedData['photo'] = $request ->file('photo')->store('reports', 'public');
-
+            $validatedData['photo'] = $request->file('photo')->store('reports', 'public');
         }
-
 
         // Update data laporan di database
         $report->update($validatedData);

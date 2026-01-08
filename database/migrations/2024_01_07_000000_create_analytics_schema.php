@@ -23,6 +23,7 @@ return new class extends Migration
 
         Schema::create('dim_lokasi', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('original_room_id')->nullable()->index(); // Tambahan: Mapping ID asli Room
             $table->string('nama_gedung');
             $table->string('nama_ruangan');
             $table->timestamps();
@@ -30,6 +31,7 @@ return new class extends Migration
 
         Schema::create('dim_kategori', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('original_category_id')->nullable()->index(); // Tambahan: Mapping ID asli Category
             $table->string('nama_kategori');
             $table->timestamps();
         });
@@ -42,6 +44,7 @@ return new class extends Migration
 
         Schema::create('dim_validator', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('original_user_id')->nullable()->index(); // Tambahan: Mapping ID asli User/Petugas
             $table->string('nama_lengkap');
             $table->timestamps();
         });
@@ -49,33 +52,29 @@ return new class extends Migration
         // 2. Fact Tables
         Schema::create('fact_kehilangan', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('report_id')->index(); // Link ke tabel reports
             $table->foreignId('waktu_id')->constrained('dim_waktu');
             $table->foreignId('lokasi_id')->constrained('dim_lokasi');
             $table->foreignId('kategori_id')->constrained('dim_kategori');
-            $table->integer('jumlah_laporan_hilang')->default(0);
+            $table->integer('jumlah_laporan_hilang')->default(1);
             $table->timestamps();
         });
 
         Schema::create('fact_penemuan', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('report_id')->index(); // Link ke tabel reports
             $table->foreignId('waktu_id')->constrained('dim_waktu');
+            $table->foreignId('lokasi_id')->constrained('dim_lokasi');
             $table->foreignId('kategori_id')->constrained('dim_kategori');
             $table->foreignId('status_id')->constrained('dim_status');
-            $table->integer('jumlah_barang_masuk')->default(0);
-            $table->timestamps();
-        });
-
-        Schema::create('fact_pengembalian', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('validator_id')->constrained('dim_validator');
-            $table->integer('jumlah_kembali')->default(0);
+            $table->integer('jumlah_barang_masuk')->default(1);
             $table->timestamps();
         });
     }
 
     public function down()
     {
-        Schema::dropIfExists('fact_pengembalian');
+        Schema::dropIfExists('fact_pengembalian'); // Tambahkan baris ini paling atas
         Schema::dropIfExists('fact_penemuan');
         Schema::dropIfExists('fact_kehilangan');
         Schema::dropIfExists('dim_validator');

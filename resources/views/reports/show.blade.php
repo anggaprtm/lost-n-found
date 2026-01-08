@@ -51,6 +51,7 @@
                         <a href="{{ Storage::url($report->photo) }}" target="_blank">
                             <img src="{{ Storage::url($report->photo) }}"
                                  alt="{{ $report->item_name }}"
+                                 onerror="this.onerror=null; this.src='https://placehold.co/600x400?text=Image+Not+Found'"
                                  class="w-full h-auto object-cover rounded-lg border cursor-pointer hover:opacity-90 transition-opacity">
                         </a>
                     @else

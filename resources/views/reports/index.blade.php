@@ -65,7 +65,7 @@
                             <td class="px-6 py-4">
                                 <div class="flex items-center">
                                     @if($report->photo)
-                                        <img src="{{ Storage::url($report->photo) }}" alt="{{ $report->item_name }}" 
+                                        <img src="{{ Storage::url($report->photo) }}" alt="{{ $report->item_name }}" onerror="this.onerror=null; this.src='https://placehold.co/100x100?text=No+Image'"
                                              class="w-12 h-12 rounded-lg object-cover mr-4">
                                     @else
                                         <div class="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center mr-4">

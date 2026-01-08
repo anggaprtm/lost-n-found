@@ -13,6 +13,9 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        // Jalankan Seeder Dimensi Waktu terlebih dahulu
+        $this->call(DimWaktuSeeder::class);
+
         // Create Admin User
         User::create([
             'name' => 'Administrator',
@@ -74,5 +77,8 @@ class DatabaseSeeder extends Seeder
         foreach ($categories as $categoryName) {
             Category::create(['name' => $categoryName]);
         }
+
+        // Sinkronisasi data master ke Data Warehouse (Dimension Tables)
+        $this->call(DimensiSeeder::class);
     }
 }

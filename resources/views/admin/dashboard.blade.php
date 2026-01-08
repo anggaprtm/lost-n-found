@@ -16,7 +16,7 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         
         <div class="bg-white rounded-xl p-6 shadow-sm border-l-4 border-secondary hover:shadow-md transition duration-200">
             <div class="flex justify-between items-start">
@@ -34,27 +34,11 @@
             <div class="flex justify-between items-start">
                 <div>
                     <p class="text-gray-500 text-sm font-medium">Total Ditemukan</p>
-                    <p class="text-3xl font-bold text-gray-800 mt-2">{{ $stats['total_returned'] }}</p>
+                    <p class="text-3xl font-bold text-gray-800 mt-2">{{ $stats['total_found'] }}</p>
                 </div>
                 <div class="p-2 bg-blue-50 rounded-lg text-primary">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </div>
-            </div>
-        </div>
-
-        <div class="bg-gradient-to-br from-[#073763] to-[#0a4d8c] rounded-xl p-6 text-white shadow-lg relative overflow-hidden">
-            <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white opacity-10 rounded-full blur-xl"></div>
-            <div class="flex justify-between items-end relative z-10">
-                <div>
-                    <p class="text-blue-100 text-sm">Success Rate</p>
-                    <p class="text-3xl font-bold mt-1">{{ $stats['success_rate'] }}%</p>
-                </div>
-                <div class="text-2xl font-bold opacity-80">
-                    {{ $stats['success_rate'] > 80 ? 'A' : ($stats['success_rate'] > 50 ? 'B' : 'C') }}
-                </div>
-            </div>
-            <div class="w-full bg-blue-900 bg-opacity-30 rounded-full h-1.5 mt-4 relative z-10">
-                <div class="bg-blue-300 h-1.5 rounded-full transition-all duration-1000" style="width: {{ $stats['success_rate'] }}%"></div>
             </div>
         </div>
 
@@ -96,29 +80,7 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <h2 class="text-lg font-bold text-gray-900 mb-4">🏆 Top Validator</h2>
-            <div class="flex flex-col space-y-4 h-64 overflow-y-auto pr-2 custom-scrollbar">
-                @php $maxVal = $validatorPerformance->first()->total ?? 1; @endphp
-                @forelse($validatorPerformance as $index => $validator)
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 w-6 text-center text-sm font-bold text-gray-400">#{{ $index + 1 }}</div>
-                    <div class="flex-1 ml-3">
-                        <div class="flex justify-between text-sm mb-1">
-                            <span class="font-medium text-gray-700">{{ $validator->name }}</span>
-                            <span class="font-bold text-primary">{{ $validator->total }}</span>
-                        </div>
-                        <div class="w-full bg-gray-100 rounded-full h-1.5">
-                            <div class="bg-primary h-1.5 rounded-full" style="width: {{ ($validator->total / $maxVal) * 100 }}%"></div>
-                        </div>
-                    </div>
-                </div>
-                @empty
-                <p class="text-gray-400 text-xs text-center mt-10">Belum ada data kinerja validator.</p>
-                @endforelse
-            </div>
-        </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
 
         <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
             <h2 class="text-lg font-bold text-gray-900 mb-4">📅 Distribusi Hari</h2>

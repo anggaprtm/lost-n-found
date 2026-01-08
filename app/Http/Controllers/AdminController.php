@@ -17,19 +17,11 @@ class AdminController extends Controller
         // =================================================================
         
         $totalHilang = DB::table('fact_kehilangan')->sum('jumlah_laporan_hilang') ?? 0;
+        $totalDitemukan = DB::table('fact_penemuan')->sum('jumlah_barang_masuk') ?? 0; // Tambahan: Total Barang Temuan
         
-        try {
-            $totalKembali = DB::table('fact_pengembalian')->sum('jumlah_kembali') ?? 0;
-        } catch (\Exception $e) {
-            $totalKembali = 0; 
-        }
-
-        $successRate = ($totalHilang > 0) ? round(($totalKembali / $totalHilang) * 100, 1) : 0;
-
         $stats = [
             'total_reports'    => $totalHilang,
-            'total_returned'   => $totalKembali,
-            'success_rate'     => $successRate,
+            'total_found'      => $totalDitemukan, // Gunakan ini untuk card "Total Ditemukan"
             'pending_validations' => Report::where('status', 'pending')->count() + Claim::where('status', 'pending')->count(),
             'total_users'      => User::count(),
         ];
@@ -67,17 +59,6 @@ class AdminController extends Controller
             ->orderBy('dim_waktu.bulan_angka') // Urutkan berdasarkan angka (1, 2, 3...)
             ->get();
         
-        // D. GRAFIK KINERJA VALIDATOR (Leaderboard Petugas)
-        // Siapa petugas yang paling rajin memproses pengembalian?
-        $validatorPerformance = DB::table('fact_pengembalian')
-            // Asumsi validator_id di fact connect ke id di dim_validator
-            ->join('dim_validator', 'fact_pengembalian.validator_id', '=', 'dim_validator.id')
-            ->select('dim_validator.nama_lengkap as name', DB::raw('SUM(jumlah_kembali) as total'))
-            ->groupBy('dim_validator.nama_lengkap')
-            ->orderByDesc('total')
-            ->limit(5)
-            ->get();
-
         // E. GRAFIK HARI PALING "SIAL" (Day Analysis)
         // Hari apa barang paling sering hilang?
         $dayAnalysis = DB::table('fact_kehilangan')
@@ -108,7 +89,6 @@ class AdminController extends Controller
             'topLocations', 
             'reportsByCategory', 
             'monthlyTrend',
-            'validatorPerformance', // <--- Baru
             'dayAnalysis',          // <--- Baru
             'recentReports', 
             'recentClaims'
