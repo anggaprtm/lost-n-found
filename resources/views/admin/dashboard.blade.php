@@ -22,7 +22,7 @@
             <div class="flex justify-between items-start">
                 <div>
                     <p class="text-gray-500 text-sm font-medium">Total Kehilangan</p>
-                    <p class="text-3xl font-bold text-gray-800 mt-2">{{ $stats['total_reports'] }}</p>
+                    <p class="text-3xl font-bold text-gray-800 mt-2">{{ $stats['total_lost'] }}</p>
                 </div>
                 <div class="p-2 bg-red-50 rounded-lg text-secondary">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
@@ -60,7 +60,16 @@
             <h2 class="text-lg font-bold text-gray-900 mb-2">🔥 Lokasi Rawan</h2>
             <p class="text-xs text-gray-500 mb-6">Klik bar untuk detail ruangan</p>
             <div class="h-64">
-                <canvas id="locationChart"></canvas>
+                @if($topLocations->isNotEmpty())
+                    <canvas id="locationChart"></canvas>
+                @else
+                    <div class="flex items-center justify-center h-full text-center text-gray-400">
+                        <div>
+                            <svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            <p class="text-sm">Data tidak cukup untuk ditampilkan.</p>
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
 
@@ -85,7 +94,16 @@
         <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
             <h2 class="text-lg font-bold text-gray-900 mb-4">📅 Distribusi Hari</h2>
             <div class="h-64">
-                <canvas id="dayChart"></canvas>
+                @if($dayAnalysis->isNotEmpty())
+                    <canvas id="dayChart"></canvas>
+                @else
+                    <div class="flex items-center justify-center h-full text-center text-gray-400">
+                        <div>
+                            <svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <p class="text-sm">Data tidak cukup untuk ditampilkan.</p>
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
 
@@ -93,7 +111,16 @@
             <h2 class="text-lg font-bold text-gray-900 mb-1">Proporsi Kategori</h2>
             <p class="text-xs text-gray-500 mb-4">Berdasarkan jenis barang</p>
             <div class="h-64">
-                <canvas id="categoryChart"></canvas>
+                @if($reportsByCategory->isNotEmpty())
+                    <canvas id="categoryChart"></canvas>
+                @else
+                     <div class="flex items-center justify-center h-full text-center text-gray-400">
+                        <div>
+                            <svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                            <p class="text-sm">Data tidak cukup untuk ditampilkan.</p>
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
     </div>

@@ -69,6 +69,7 @@ Route::middleware('auth')->group(function () {
         
         // Temporary route for fixing data. Please remove after use.
         Route::get('/fix-report-statuses', [AdminController::class, 'fixReportStatuses'])->name('admin.fix-statuses');
+        Route::get('/backfill-analytics', [AdminController::class, 'backfillAnalytics'])->name('admin.backfill-analytics');
 
         // Validation Pages
         Route::get('/reports/validation', [ReportController::class, 'validationPage'])->name('reports.validation');

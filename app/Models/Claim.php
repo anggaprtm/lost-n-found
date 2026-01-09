@@ -12,6 +12,8 @@ class Claim extends Model
     protected $fillable = [
         'report_id',
         'user_id',
+        'claimer_name',
+        'claimer_id_number',
         'description',
         'status',
         'validator_id',

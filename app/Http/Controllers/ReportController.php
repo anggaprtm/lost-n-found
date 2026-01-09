@@ -27,14 +27,12 @@ class ReportController extends Controller
     public function publicIndex(Request $request)
     {
         $query = Report::with(['user', 'room.building', 'category'])
-            ->where('status', 'approved');
+            ->where('type', 'found') // Default to found items
+            ->where('status', 'approved'); // Only show verified items
 
         // Logika filter dari kodemu yang sudah bagus
         if ($request->filled('search')) {
             $query->where('item_name', 'like', '%' . $request->search . '%');
-        }
-        if ($request->filled('type')) {
-            $query->where('type', $request->type);
         }
         if ($request->filled('category')) {
             $query->where('category_id', $request->category);

@@ -44,7 +44,9 @@ class DatabaseSeeder extends Seeder
 
         // Create Buildings
         $buildings = [
-            'Gedung A',
+            'Lantai 1',
+            'Lantai 2',
+            'Lantai 3',
             'Gedung B',
             'Gedung C',
             'Perpustakaan',

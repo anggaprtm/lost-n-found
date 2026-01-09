@@ -27,6 +27,17 @@ class ReportObserver
         DB::table('fact_kehilangan')->where('report_id', $report->id)->delete();
         DB::table('fact_penemuan')->where('report_id', $report->id)->delete();
     }
+    
+    /**
+     * Public method to allow manual syncing, useful for backfilling.
+     */
+    public function syncReportById($reportId)
+    {
+        $report = Report::find($reportId);
+        if ($report) {
+            $this->syncToFact($report);
+        }
+    }
 
     private function syncToFact(Report $report)
     {
@@ -37,29 +48,33 @@ class ReportObserver
         $statusId = $this->ensureStatus($report->status);
 
         // --- SKENARIO 1: BARANG HILANG (Insert ke fact_kehilangan) ---
-        if ($report->type == 'lost' || $report->type == 'Kehilangan') {
-            DB::table('fact_kehilangan')->insert([
-                'report_id'             => $report->id, // FIX: Tambahkan report_id
-                'waktu_id'              => $waktuId,
-                'lokasi_id'             => $lokasiId,
-                'kategori_id'           => $kategoriId,
-                'jumlah_laporan_hilang' => 1,
-                'created_at'            => now(),
-                'updated_at'            => now(),
-            ]);
+        if ($report->type === 'lost') {
+            DB::table('fact_kehilangan')->updateOrInsert(
+                ['report_id' => $report->id],
+                [
+                    'waktu_id'              => $waktuId,
+                    'lokasi_id'             => $lokasiId,
+                    'kategori_id'           => $kategoriId,
+                    'jumlah_laporan_hilang' => 1,
+                    'created_at'            => $report->created_at,
+                    'updated_at'            => $report->updated_at,
+                ]
+            );
         }
         // --- SKENARIO 2: BARANG DITEMUKAN (Insert ke fact_penemuan) ---
-        elseif ($report->type == 'found' || $report->type == 'Penemuan') {
-            DB::table('fact_penemuan')->insert([
-                'report_id'           => $report->id, // FIX: Tambahkan report_id
-                'waktu_id'            => $waktuId,
-                'lokasi_id'           => $lokasiId,
-                'kategori_id'         => $kategoriId,
-                'status_id'           => $statusId,
-                'jumlah_barang_masuk' => 1,
-                'created_at'          => now(),
-                'updated_at'          => now(),
-            ]);
+        elseif ($report->type === 'found') {
+            DB::table('fact_penemuan')->updateOrInsert(
+                ['report_id' => $report->id],
+                [
+                    'waktu_id'            => $waktuId,
+                    'lokasi_id'           => $lokasiId,
+                    'kategori_id'         => $kategoriId,
+                    'status_id'           => $statusId,
+                    'jumlah_barang_masuk' => 1,
+                    'created_at'          => $report->created_at,
+                    'updated_at'          => $report->updated_at,
+                ]
+            );
         }
     }
 
@@ -67,35 +82,41 @@ class ReportObserver
 
     private function ensureWaktu($dateStr)
     {
-        $date = Carbon::parse($dateStr);
-        $id = (int)$date->format('Ymd');
+        $date = Carbon::parse($dateStr)->startOfDay();
+        
+        $waktu = DB::table('dim_waktu')->where('tanggal', $date->toDateString())->first();
 
-        if (!DB::table('dim_waktu')->where('id', $id)->exists()) {
-            DB::table('dim_waktu')->insert([
-                'id' => $id,
-                'tanggal' => $date->format('Y-m-d'),
-                'hari_ke' => $date->day,
-                'hari_nama' => $date->translatedFormat('l'),
-                'bulan_angka' => $date->month,
-                'bulan_nama' => $date->translatedFormat('F'),
-                'tahun' => $date->year,
-                'pekan_ke' => $date->weekOfYear,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+        if ($waktu) {
+            return $waktu->id;
         }
-        return $id;
+        
+        // Jika tidak ada, buat record baru dan kembalikan ID-nya
+        return DB::table('dim_waktu')->insertGetId([
+            'tanggal' => $date->toDateString(),
+            'hari_ke' => $date->day,
+            'hari_nama' => $date->translatedFormat('l'),
+            'bulan_angka' => $date->month,
+            'bulan_nama' => $date->translatedFormat('F'),
+            'tahun' => $date->year,
+            'pekan_ke' => $date->weekOfYear,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 
     private function ensureLokasi($roomId)
     {
+        if (!$roomId) return null;
+
         $lokasi = DB::table('dim_lokasi')->where('original_room_id', $roomId)->first();
         if ($lokasi) return $lokasi->id;
 
         $room = Room::with('building')->find($roomId);
+        if (!$room) return null;
+
         return DB::table('dim_lokasi')->insertGetId([
             'original_room_id' => $room->id,
-            'nama_gedung' => $room->building->name ?? 'Unknown',
+            'nama_gedung' => optional($room->building)->name ?? 'Unknown',
             'nama_ruangan' => $room->name,
             'created_at' => now(),
             'updated_at' => now(),
@@ -104,10 +125,14 @@ class ReportObserver
 
     private function ensureKategori($catId)
     {
+        if (!$catId) return null;
+        
         $kategori = DB::table('dim_kategori')->where('original_category_id', $catId)->first();
         if ($kategori) return $kategori->id;
 
         $cat = Category::find($catId);
+        if (!$cat) return null;
+
         return DB::table('dim_kategori')->insertGetId([
             'original_category_id' => $cat->id,
             'nama_kategori' => $cat->name,
@@ -118,6 +143,8 @@ class ReportObserver
 
     private function ensureStatus($statusLabel)
     {
+        if (!$statusLabel) return null;
+
         $status = DB::table('dim_status')->where('label_status', $statusLabel)->first();
         if ($status) return $status->id;
 

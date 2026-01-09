@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Report;
 use App\Models\Claim;
 use App\Models\User;
+use App\Observers\ReportObserver;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -16,12 +17,12 @@ class AdminController extends Controller
         // BAGIAN 1: SCORECARDS
         // =================================================================
         
-        $totalHilang = DB::table('fact_kehilangan')->sum('jumlah_laporan_hilang') ?? 0;
-        $totalDitemukan = DB::table('fact_penemuan')->sum('jumlah_barang_masuk') ?? 0; // Tambahan: Total Barang Temuan
+        $totalHilang = DB::table('fact_kehilangan')->count();
+        $totalDitemukan = DB::table('fact_penemuan')->count();
         
         $stats = [
-            'total_reports'    => Report::count(),
-            'total_found'      => Report::where('type','found')->count(),
+            'total_lost'       => $totalHilang,
+            'total_found'      => $totalDitemukan,
             'pending_validations' => Report::where('status', 'pending')->count() + Claim::where('status', 'pending')->count(),
             'total_users'      => User::count(),
         ];
@@ -32,18 +33,18 @@ class AdminController extends Controller
 
         // A. GRAFIK "TOP 5 LOKASI ANGKER"
         $topLocations = DB::table('fact_kehilangan')
-            ->join('dim_lokasi', 'fact_kehilangan.lokasi_id', '=', 'dim_lokasi.id')
-            ->select('dim_lokasi.nama_gedung as name', DB::raw('SUM(jumlah_laporan_hilang) as total'))
-            ->groupBy('dim_lokasi.nama_gedung')
+            ->leftJoin('dim_lokasi', 'fact_kehilangan.lokasi_id', '=', 'dim_lokasi.id')
+            ->select(DB::raw('COALESCE(dim_lokasi.nama_gedung, "Lokasi Tidak Diketahui") as name'), DB::raw('SUM(jumlah_laporan_hilang) as total'))
+            ->groupBy('name')
             ->orderByDesc('total')
             ->limit(5)
             ->get();
 
         // B. GRAFIK KATEGORI
         $reportsByCategory = DB::table('fact_kehilangan')
-            ->join('dim_kategori', 'fact_kehilangan.kategori_id', '=', 'dim_kategori.id')
-            ->select('dim_kategori.nama_kategori as name', DB::raw('SUM(jumlah_laporan_hilang) as total'))
-            ->groupBy('dim_kategori.nama_kategori')
+            ->leftJoin('dim_kategori', 'fact_kehilangan.kategori_id', '=', 'dim_kategori.id')
+            ->select(DB::raw('COALESCE(dim_kategori.nama_kategori, "Kategori Tidak Diketahui") as name'), DB::raw('SUM(jumlah_laporan_hilang) as total'))
+            ->groupBy('name')
             ->get();
 
         // C. GRAFIK TREN BULANAN (REVISI DIM_WAKTU)
@@ -57,10 +58,10 @@ class AdminController extends Controller
         
         // E. GRAFIK HARI PALING "SIAL" (Day Analysis)
         $dayAnalysis = DB::table('fact_kehilangan')
-            ->join('dim_waktu', 'fact_kehilangan.waktu_id', '=', 'dim_waktu.id')
-            ->select('dim_waktu.hari_nama as day', DB::raw('SUM(jumlah_laporan_hilang) as total'))
-            ->groupBy('dim_waktu.hari_nama')
-            ->orderByRaw("FIELD(dim_waktu.hari_nama, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu')")
+            ->leftJoin('dim_waktu', 'fact_kehilangan.waktu_id', '=', 'dim_waktu.id')
+            ->select(DB::raw('COALESCE(dim_waktu.hari_nama, "Hari Tidak Diketahui") as day'), DB::raw('SUM(jumlah_laporan_hilang) as total'))
+            ->groupBy('day')
+            ->orderByRaw("FIELD(day, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu', 'Hari Tidak Diketahui')")
             ->get();
 
         // =================================================================
@@ -202,5 +203,28 @@ class AdminController extends Controller
         }
 
         return "Fixed {$count} reports that had an approved claim but were not marked as 'returned'. You can now remove the temporary route used to run this fix.";
+    }
+
+    public function backfillAnalytics(ReportObserver $observer)
+    {
+        // Truncate tables for a clean sync
+        DB::table('fact_kehilangan')->truncate();
+        DB::table('fact_penemuan')->truncate();
+        
+        $reports = Report::all();
+        $totalCount = $reports->count();
+        $lostCount = 0;
+        $foundCount = 0;
+
+        foreach ($reports as $report) {
+            if ($report->type === 'lost') {
+                $lostCount++;
+            } elseif ($report->type === 'found') {
+                $foundCount++;
+            }
+            $observer->syncReportById($report->id);
+        }
+
+        return "Backfill complete. Total reports processed: {$totalCount}. Found reports synced: {$foundCount}. Lost reports synced: {$lostCount}.";
     }
 }

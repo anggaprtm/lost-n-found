@@ -11,7 +11,9 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
@@ -315,19 +317,39 @@ class PetugasController extends Controller
 
     public function storeAssignedClaim(Request $request, Report $report)
     {
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
-        ]);
-
         // Double check, just in case
         if ($report->type !== 'found' || $report->status !== 'approved') {
             return redirect()->route('petugas.reports.show', $report)->with('error', 'Hanya barang temuan yang sudah disetujui yang dapat di-assign.');
         }
 
+        $userId = null;
+
+        if ($request->input('assign_type') === 'manual') {
+            $request->validate([
+                'claimer_name' => 'required|string|max:255',
+                'claimer_id_number' => 'required|string|max:255|unique:users,nim',
+            ]);
+
+            $user = User::create([
+                'name' => $request->claimer_name,
+                'nim' => $request->claimer_id_number,
+                'email' => $request->claimer_id_number . '@lostnfound.app', // Dummy email
+                'password' => Hash::make("password"),
+                'role' => 'pengguna',
+            ]);
+
+            $userId = $user->id;
+        } else {
+            $request->validate([
+                'user_id' => 'required|exists:users,id',
+            ]);
+            $userId = $request->user_id;
+        }
+
         // Buat klaim langsung dengan status 'approved'
-        $claim = Claim::create([
+        Claim::create([
             'report_id'   => $report->id,
-            'user_id'     => $request->user_id,
+            'user_id'     => $userId,
             'description' => 'Klaim di-assign langsung oleh petugas.',
             'status'      => 'approved', // Langsung approved
             'validator_id'=> auth()->id(), // Petugas yang login adalah validatornya

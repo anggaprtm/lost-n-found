@@ -69,7 +69,7 @@ class User extends Authenticatable
 
     public function isMahasiswa()
     {
-        return $this->role === 'mahasiswa';
+        return $this->role === 'pengguna';
     }
 
    public function getRoleAttribute($value)
