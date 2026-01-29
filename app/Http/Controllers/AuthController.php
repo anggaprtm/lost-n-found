@@ -19,18 +19,33 @@ class AuthController extends Controller
     public function showRegistrationForm()
     {
         if (auth()->check()) {
-            return redirect()->route('dashboard');
+            // Redirect berdasarkan role
+            return $this->redirectBasedOnRole();
         }
         return view('auth.register');
     }
 
-   public function showLoginForm()
+    public function showLoginForm()
     {
         if (auth()->check()) {
+            // Redirect berdasarkan role
+            return $this->redirectBasedOnRole();
+        }
+        return view('auth.login');
+    }
+
+    // Method helper untuk redirect berdasarkan role
+    private function redirectBasedOnRole()
+    {
+        $user = auth()->user();
+        
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        } elseif ($user->role === 'petugas') {
+            return redirect()->route('petugas.dashboard');
+        } else {
             return redirect()->route('dashboard');
         }
-
-        return view('auth.login');
     }
 
 
@@ -119,7 +134,7 @@ class AuthController extends Controller
     public function guestAccess()
     {
         // Perbaikan: Arahkan ke landing page
-        return redirect()->route('reports.public_index');
+        return redirect()->route('landing');
     }
 
     public function logout(Request $request)

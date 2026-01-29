@@ -1,21 +1,18 @@
-// tailwind.config.js
-
 export default {
   content: [
     "./resources/**/*.blade.php",
     "./resources/**/*.js",
+    "./resources/**/*.vue",
   ],
   theme: {
     extend: {
-        // ▼▼▼ TAMBAHKAN KODE INI ▼▼▼
-        colors: {
-            'prussian-blue': '#073763',
-            'silver': '#C0C0C0',
-            'pompadour': '#741B47',
-            'success': '#16a34a',
-            'danger': '#dc2626',
-        },
-        // ▲▲▲ SAMPAI SINI ▲▲▲
+      fontFamily: {
+        sans: ['Plus Jakarta Sans', 'sans-serif'],
+      },
+      colors: {
+        primary: '#073763',
+        secondary: '#741B47',
+      },
     },
   },
   plugins: [],

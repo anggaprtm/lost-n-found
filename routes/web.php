@@ -15,21 +15,24 @@ use App\Http\Controllers\UserController;
 
 // == LANDING PAGE ==
 Route::get('/', [ReportController::class, 'publicIndex'])->name('landing');
-Route::get('/reports/public', [ReportController::class, 'publicReportsIndex'])->name('reports.public_index');
-Route::get('/temuan', [ReportController::class, 'publicReportsIndex'])
-     ->name('temuan.index');
+Route::get('/reports/public', [ReportController::class, 'publicReportIndex'])->name('report.public_index');
 Route::get('/temuan/search', [ReportController::class, 'publicSearch'])
     ->name('temuan.search');
 // == AUTH ==
+// == AUTH ==
 Route::get('/login', [AuthController::class, 'showLoginForm'])
-    ->middleware('guest')
-    ->name('login');
-
-Route::post('/login', [AuthController::class, 'login'])->name('login.attempt');
+    ->name('login');  // ✅ Hapus ->middleware('guest')
+    
+Route::post('/login', [AuthController::class, 'login'])
+    ->middleware('guest')  // ✅ Tetap pakai guest di POST
+    ->name('login.attempt');
+    
 Route::get('/register', [AuthController::class, 'showRegistrationForm'])
-    ->middleware('guest')
-    ->name('register');
-Route::post('/register', [AuthController::class, 'register'])->name('register.attempt');
+    ->name('register');  // ✅ Hapus ->middleware('guest')
+    
+Route::post('/register', [AuthController::class, 'register'])
+    ->middleware('guest')  // ✅ Tetap pakai guest di POST
+    ->name('register.attempt');
 
 // == AUTHENTICATED ROUTES ==
 Route::middleware('auth')->group(function () {

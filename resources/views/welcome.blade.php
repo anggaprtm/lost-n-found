@@ -1,147 +1,201 @@
-@php
-    $hideNavigation = true;
-@endphp
-
 @extends('layouts.app')
 
-@section('title', 'Selamat Datang di FTMM Lost & Found')
+@section('title', 'FTMM Lost & Found')
 
 @section('content')
-<div>
-    {{-- ========================================================== --}}
-    {{-- == SECTION 1: HERO - LOST & FOUND                        == --}}
-    {{-- ========================================================== --}}
-    <section
-        class="min-h-screen bg-cover bg-center bg-fixed relative
-               flex items-center justify-center text-white"
-        style="background-image: url('/images/GKB.jpg');"
-    >
-        <!-- Overlay -->
-        <div class="absolute inset-0
-                    bg-gradient-to-b
+
+<section class="relative min-h-[90vh] overflow-visible">
+
+    {{-- BACKGROUND IMAGE --}}
+    <div class="absolute inset-0">
+        <img src="/images/GKB.jpg"
+             alt="FTMM"
+             class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-b
                     from-[#073763]/90
-                    to-[#741B47]/70">
+                    via-[#073763]/70
+                    to-[#741B47]/80">
+        </div>
+    </div>
+
+    {{-- HERO CONTENT --}}
+    <div class="relative z-10 max-w-7xl mx-auto px-6
+                pt-40 pb-56 text-center text-white">
+
+        <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight">
+            FTMM Lost & Found
+        </h1>
+
+        <p class="mt-4 text-base md:text-lg text-gray-200 max-w-2xl mx-auto">
+            Temukan kembali barang yang hilang atau laporkan barang temuan
+            di lingkungan Fakultas Teknologi Maju dan Multidisiplin.
+        </p>
+
+        <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+
+            {{-- GLASS BUTTON PRIMARY --}}
+            <a href="#lost-found"
+            class="inline-flex items-center justify-center
+                    px-8 py-3 rounded-full
+                    bg-white/20 backdrop-blur-md
+                    border border-white/30
+                    text-white font-semibold
+                    shadow-lg
+                    hover:bg-white/30
+                    hover:-translate-y-0.5
+                    hover:shadow-xl
+                    transition-all duration-300">
+                Lihat Barang
+            </a>
+
+            {{-- GLASS BUTTON OUTLINE --}}
+            <a href="{{ auth()->check() ? route('reports.create') : route('login') }}"
+            class="inline-flex items-center justify-center
+                    px-8 py-3 rounded-full
+                    bg-white/10 backdrop-blur-md
+                    border border-white/40
+                    text-white font-semibold
+                    shadow-md
+                    hover:bg-white/25
+                    hover:text-white
+                    hover:-translate-y-0.5
+                    transition-all duration-300">
+                Buat Laporan
+            </a>
+
         </div>
 
-        <!-- Content -->
-        <div class="relative z-10 text-center px-4 max-w-4xl mx-auto">
-            <h1
-                class="text-4xl md:text-6xl
-                       font-black tracking-tight
-                       text-white drop-shadow-lg"
-            >
-                Barang
-                <span id="typing-effect" class="text-yellow-300">
-                    Hilang & Ditemukan
-                </span>
-            </h1>
+    </div>
 
-            <p class="mt-6 text-lg md:text-xl
-                      text-gray-200 max-w-2xl mx-auto">
-                Platform terpusat untuk melaporkan barang yang hilang
-                dan menemukan kembali barang temuan di lingkungan FTMM.
-            </p>
+    {{-- FLOATING PANEL --}}
+    <div id="lost-found"
+         class="relative z-20 -mt-32">
 
-            <!-- CTA -->
-            <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+        <div class="max-w-7xl mx-auto px-6">
 
-                <!-- Browse Lost & Found -->
-                <a
-                    href="{{ route('temuan.index') }}"
-                    class="inline-flex items-center justify-center gap-2
-                           bg-white text-[#073763]
-                           rounded-full py-3 px-8
-                           text-lg font-bold
-                           shadow-lg
-                           hover:bg-[#073763]
-                           hover:text-white
-                           transition-all duration-300"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         class="w-5 h-5"
-                         fill="none" viewBox="0 0 24 24"
-                         stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M21 21l-6-6m2-5a7 7 0 11-14 0
-                                 7 7 0 0114 0z" />
-                    </svg>
-                    Lihat Barang Hilang & Temuan
-                </a>
+            {{-- PANEL CONTAINER --}}
+            <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
 
-                <!-- Report Lost -->
-                <a
-                    href="{{ auth()->check() && auth()->user()->role === 'admin'
-                            ? route('reports.index')
-                            : route('login') }}"
-                    class="inline-flex items-center justify-center gap-2
-                           rounded-full py-3 px-8
-                           text-lg font-semibold
-                           border-2 border-white/50
-                           text-white
-                           hover:bg-white
-                           hover:text-[#073763]
-                           transition-all duration-300"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         class="w-5 h-5"
-                         fill="none" viewBox="0 0 24 24"
-                         stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M12 4v16m8-8H4" />
-                    </svg>
-                    Laporkan Kehilangan
-                </a>
+                {{-- INFO KLAIM --}}
+                <div class="mb-6 rounded-xl
+                            bg-blue-50 border border-blue-200
+                            px-5 py-4 text-sm text-blue-800">
+                    <strong>Informasi Klaim:</strong>
+                    Barang temuan dapat diklaim dengan
+                    <strong>login ke sistem</strong>,
+                    atau datang langsung ke
+                    <strong>Lt. 10 Ruang Sarpras</strong>.
+                    Petugas akan membantu proses klaim Anda.
+                </div>
+
+                {{-- FILTER --}}
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+
+                    {{-- SEARCH --}}
+                    <div class="md:col-span-2 relative">
+                        <input type="text"
+                            id="searchInput"
+                            placeholder="Cari nama barang, lokasi, atau deskripsi..."
+                            class="w-full rounded-lg border border-gray-300
+                                    px-4 py-3 text-sm
+                                    focus:ring-2 focus:ring-[#073763]
+                                    focus:border-[#073763]">
+                    </div>
+
+                    {{-- CATEGORY --}}
+                    <div>
+                        <select id="categoryInput"
+                                class="w-full rounded-lg border border-gray-300
+                                    px-4 py-3 text-sm
+                                    focus:ring-2 focus:ring-[#073763]
+                                    focus:border-[#073763]">
+                            <option value="">Semua Kategori</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}">
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                </div>
+
+
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+                    <div id="reportGrid"
+                        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+                        @include('reports._cards', [
+                            'reports' => $reports,
+                            'highlight' => request('search')
+                        ])
+
+                    </div>
+
+                    <template id="skeletonTemplate">
+                        <div class="animate-pulse bg-white rounded-xl border p-4 space-y-3">
+                            <div class="h-40 bg-gray-200 rounded"></div>
+                            <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+                            <div class="h-3 bg-gray-200 rounded w-full"></div>
+                            <div class="h-3 bg-gray-200 rounded w-2/3"></div>
+                        </div>
+                    </template>
+
+
+                </div>
+
 
             </div>
         </div>
-    </section>
-</div>
+    </div>
+
+    <section class="bg-white py-16"></section>
 
 
-{{-- SCRIPT & STYLE MANDIRI (TIDAK PERLU EDIT FILE LAIN) --}}
+</section>
+
+@endsection
+
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const words = ["Dompet?", "Kunci?",  "Laptop?", "Apa Saja?", "Tumbler?"];
-    let i = 0;
-    let j = 0;
-    let currentWord = "";
-    let isDeleting = false;
-    const typingEffectElement = document.getElementById("typing-effect");
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput   = document.getElementById('searchInput');
+    const categoryInput = document.getElementById('categoryInput');
+    const reportGrid    = document.getElementById('reportGrid');
 
-    function type() {
-        currentWord = words[i];
-        if (isDeleting) {
-            typingEffectElement.textContent = currentWord.substring(0, j - 1);
-            j--;
-            if (j === 0) {
-                isDeleting = false;
-                i++;
-                if (i === words.length) {
-                    i = 0;
-                }
-            }
-        } else {
-            typingEffectElement.textContent = currentWord.substring(0, j + 1);
-            j++;
-            if (j === currentWord.length) {
-                isDeleting = true;
-                setTimeout(() => type(), 2000); // Jeda sebelum menghapus
-                return;
-            }
-        }
-        setTimeout(type, isDeleting ? 100 : 200);
+    let debounceTimer = null;
+
+    function showSkeleton() {
+        const template = document.getElementById('skeletonTemplate').innerHTML;
+        reportGrid.innerHTML = template.repeat(8);
     }
-    type();
+
+    function fetchResults() {
+        const search   = searchInput.value;
+        const category = categoryInput.value;
+
+        showSkeleton();
+
+        fetch(`{{ route('temuan.search') }}?search=${encodeURIComponent(search)}&category=${category}`, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(res => res.text())
+        .then(html => {
+            reportGrid.innerHTML = html;
+        })
+        .catch(() => {
+            reportGrid.innerHTML = `<p class="col-span-full text-center text-sm text-gray-500">Gagal memuat data.</p>`;
+        });
+    }
+
+
+    function debounceFetch() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(fetchResults, 400); // ⏱️ debounce 400ms
+    }
+
+    searchInput.addEventListener('input', debounceFetch);
+    categoryInput.addEventListener('change', fetchResults);
 });
 </script>
 
-<style>
-/* Menghilangkan panah default dari tag <details> */
-details > summary {
-  list-style: none;
-}
-details > summary::-webkit-details-marker {
-  display: none;
-}
-</style>
-@endsection

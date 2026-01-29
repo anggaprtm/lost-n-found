@@ -20,96 +20,115 @@ class ReportController extends Controller
     // =================================================
     use AuthorizesRequests; // <-- 2. TAMBAHKAN INI
 
-    /**
-     * Menampilkan Landing Page lengkap (Hero, FAQ, dll. + daftar laporan).
-     * Route: GET / -> name('landing')
-     */
     public function publicIndex(Request $request)
     {
         $query = Report::with(['user', 'room.building', 'category'])
-            ->where('type', 'found') // Default to found items
-            ->where('status', 'approved'); // Only show verified items
-
-        // Logika filter dari kodemu yang sudah bagus
-        if ($request->filled('search')) {
-            $query->where('item_name', 'like', '%' . $request->search . '%');
-        }
-        if ($request->filled('category')) {
-            $query->where('category_id', $request->category);
-        }
-        if ($request->filled('building')) {
-            $query->whereHas('room', fn($q) => $q->where('building_id', $request->building));
-        }
-
-        $reports = $query->latest()->paginate(9);
-        $categories = Category::all();
-        $buildings = Building::all();
-
-        // Mengarah ke file view landing page utama (welcome.blade.php)
-        return view('welcome', compact('reports', 'categories', 'buildings'));
-    }
-    
-    /**
-     * == INI METHOD BARU ==
-     * Menampilkan HANYA daftar laporan publik.
-     * Route: GET /reports/public -> name('reports.public_index')
-     */
-    public function publicReportsIndex(Request $request)
-    {
-        // Logikanya sama persis dengan publicIndex
-        $query = Report::with(['user', 'room.building', 'category'])
+            ->whereIn('type', ['lost', 'found'])
             ->where('status', 'approved');
 
         if ($request->filled('search')) {
-            $query->where('item_name', 'like', '%' . $request->search . '%');
+            $query->where(function ($q) use ($request) {
+                $q->where('item_name', 'like', "%{$request->search}%")
+                ->orWhere('description', 'like', "%{$request->search}%");
+            });
         }
+
         if ($request->filled('type')) {
             $query->where('type', $request->type);
         }
+
         if ($request->filled('category')) {
             $query->where('category_id', $request->category);
         }
+
         if ($request->filled('building')) {
-            $query->whereHas('room', fn($q) => $q->where('building_id', $request->building));
+            $query->whereHas('room', fn ($q) =>
+                $q->where('building_id', $request->building)
+            );
         }
-        
-        $reports = $query->latest()->paginate(12); // Bisa lebih banyak di halaman ini
+
+        $reports = $query
+            ->latest()
+            ->paginate(12)
+            ->withQueryString(); // 👈 WAJIB
+
         $categories = Category::all();
         $buildings = Building::all();
 
-        // Mengarah ke file view baru yang akan kita buat
-        return view('temuan', compact('reports', 'categories', 'buildings'));
+        return view('welcome', compact('reports', 'categories', 'buildings'));
     }
+
+
+    public function publicReportIndex(Request $request)
+    {
+        $query = Report::with(['user', 'room.building', 'category'])
+            ->whereIn('type', ['lost', 'found']) // 👈 PENTING
+            ->where('status', 'approved');
+
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('item_name', 'like', "%{$request->search}%")
+                ->orWhere('description', 'like', "%{$request->search}%");
+            });
+        }
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->category);
+        }
+
+        if ($request->filled('building')) {
+            $query->whereHas('room', fn($q) =>
+                $q->where('building_id', $request->building)
+            );
+        }
+
+         $reports = $query
+            ->latest()
+            ->paginate(12)
+            ->withQueryString();
+        $categories = Category::all();
+        $buildings = Building::all();
+
+        return view('reports.public_index', compact('reports', 'categories', 'buildings'));
+    }
+
 
     public function publicSearch(Request $request)
     {
         $query = Report::with(['room.building', 'category'])
             ->where('status', 'approved');
 
-        // search
         if ($request->filled('search')) {
             $q = $request->search;
+
             $query->where(function ($sub) use ($q) {
                 $sub->where('item_name', 'like', "%{$q}%")
-                    ->orWhere('description', 'like', "%{$q}%");
+                    ->orWhere('description', 'like', "%{$q}%")
+                    ->orWhereHas('room', function ($r) use ($q) {
+                        $r->where('name', 'like', "%{$q}%")
+                        ->orWhereHas('building', function ($b) use ($q) {
+                            $b->where('name', 'like', "%{$q}%");
+                        });
+                    });
             });
         }
 
-        // category
         if ($request->filled('category')) {
             $query->where('category_id', $request->category);
         }
 
         $reports = $query->latest()->take(12)->get();
 
-        $search = $request->search;
-
-        
         return view('reports._cards', [
-            'reports' => $reports,
-            'highlight' => $search
+            'reports'   => $reports,
+            'highlight' => $request->search
         ])->render();
     }
+
 
 
     // =================================================

@@ -193,7 +193,7 @@
                         + Buat Laporan Baru
                     </a>
                     
-                    <a href="{{ route('reports.public_index') }}" class="block w-full text-center px-4 py-3 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 hover:text-primary hover:border-primary transition">
+                    <a href="{{ route('report.public_index') }}" class="block w-full text-center px-4 py-3 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 hover:text-primary hover:border-primary transition">
                         🔍 Cari Barang Temuan
                     </a>
 

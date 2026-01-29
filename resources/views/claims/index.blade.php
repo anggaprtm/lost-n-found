@@ -111,7 +111,7 @@
                 <h3 class="mt-2 text-sm font-medium text-gray-900">Belum ada klaim</h3>
                 <p class="mt-1 text-sm text-gray-500">Anda belum mengajukan klaim untuk barang apapun.</p>
                 <div class="mt-6">
-                    <a href="{{ route('reports.public_index') }}" class="btn-primary">
+                    <a href="{{ route('report.public_index') }}" class="btn-primary">
                         Lihat Barang Temuan
                     </a>
                 </div>
