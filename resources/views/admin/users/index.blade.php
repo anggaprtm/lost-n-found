@@ -31,7 +31,7 @@
         <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
             <div class="flex items-center">
                 <div class="flex-1">
-                    <p class="text-sm font-medium text-gray-600">Civitas Academica</p> 
+                    <p class="text-sm font-medium text-gray-600">Sivitas Akademika</p> 
                     <p class="text-xs text-gray-400 mb-1">(Mahasiswa & Dosen)</p>
                     <p class="text-2xl font-bold text-gray-900">{{ $users->where('role', 'pengguna')->count() }}</p>
                 </div>

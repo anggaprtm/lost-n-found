@@ -134,6 +134,7 @@
                                 <a href="{{ route('petugas.dashboard') }}" class="{{ request()->routeIs('petugas.dashboard') ? $activeClass : $navClass }}">Dashboard</a>
                                 <a href="{{ route('petugas.reports') }}" class="{{ request()->routeIs('petugas.reports') ? $activeClass : $navClass }}">Validasi Laporan</a>
                                 <a href="{{ route('petugas.claims') }}" class="{{ request()->routeIs('petugas.claims') ? $activeClass : $navClass }}">Validasi Klaim</a>
+                                <a href="{{ route('petugas.reports.create') }}" class="{{ request()->routeIs('petugas.reports.create') ? $activeClass : $navClass }}">Buat Laporan</a>
                             @else
                                 <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? $activeClass : $navClass }}">Dashboard</a>
                                 <a href="{{ route('reports.create') }}" class="{{ request()->routeIs('reports.create') ? $activeClass : $navClass }}">Buat Laporan</a>
@@ -225,24 +226,31 @@
             @yield('content')
         </main>
 
-<footer class="bg-white border-t border-gray-200 py-8 mt-auto">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    
-                    <div class="flex flex-col justify-center">
-                        <div class="flex items-center gap-2 mb-2">
-                            <svg class="w-8 h-8 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                            <span class="text-xl font-bold text-primary">Lost & Found</span>
-                        </div>
-                        <p class="text-xs text-gray-500 mt-2">
-                            Sistem Informasi Manajemen Barang Hilang & Temuan<br>
-                            Universitas Airlangga &copy; {{ date('Y') }}
-                        </p>
-                    </div>
-
-                </div>
+<footer class="mt-auto bg-white/70 backdrop-blur-md border-t border-white/30">
+    <div class="max-w-7xl mx-auto px-6 py-6">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+            
+            <div class="flex items-center gap-2">
+                <svg class="w-7 h-7 text-yellow-500"
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <span class="text-lg font-semibold text-slate-800">
+                    Lost & Found
+                </span>
             </div>
-        </footer>
+
+            <p class="text-xs text-slate-600 text-center md:text-right leading-relaxed">
+                Lost & Found<br>
+                Fakultas Teknologi Maju dan Multidisiplin<br>
+                Universitas Airlangga © {{ date('Y') }}
+            </p>
+
+        </div>
+    </div>
+</footer>
+
     </div>
     
     @stack('scripts')

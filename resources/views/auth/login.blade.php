@@ -8,10 +8,9 @@
     
     {{-- Overlay Gelap dengan Gradasi (Biar teks terbaca jelas) --}}
     <div class="absolute inset-0 bg-gradient-to-br from-[#073763]/90 via-[#073763]/80 to-[#741B47]/90 backdrop-blur-[2px]"></div>
-
+    
     {{-- Card Login --}}
     <div class="max-w-md w-full space-y-8 z-10 relative">
-        
         {{-- Header Logo & Teks --}}
         <div class="text-center">
             <div class="mx-auto h-20 w-20 bg-white/20 rounded-2xl flex items-center justify-center mb-6 shadow-lg backdrop-blur-md border border-white/30">
@@ -54,7 +53,7 @@
                             </div>
                             <input id="nomor_induk" name="nomor_induk" type="text" 
                                 class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#073763] focus:border-[#073763] transition-colors sm:text-sm" 
-                                placeholder="Contoh: 202110370311xxx" 
+                                placeholder="Contoh: 164231xxx" 
                                 value="{{ old('nomor_induk') }}">
                         </div>
                         @error('nomor_induk')
@@ -78,7 +77,7 @@
                             </div>
                             <input id="email" name="email" type="email" 
                                 class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#073763] focus:border-[#073763] transition-colors sm:text-sm" 
-                                placeholder="nama@umm.ac.id" 
+                                placeholder="nama@ftmm.unair.ac.id" 
                                 value="{{ old('email') }}">
                         </div>
                         @error('email')
@@ -117,6 +116,19 @@
                 <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-white bg-gradient-to-r from-[#073763] to-[#0a4d8c] hover:from-[#052c50] hover:to-[#073763] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#073763] transition-all transform hover:-translate-y-0.5">
                     Masuk Sekarang
                 </button>
+
+                <p class="text-center text-sm text-gray-600 mt-6">
+                    Belum punya akun? 
+                    <a href="{{ route('register') }}" class="font-medium text-[#073763] hover:text-[#052c50] hover:underline">
+                        Daftar di sini
+                    </a>
+                </p>
+                <p class="text-center text-sm text-gray-600">
+                    Kembali ke
+                    <a href="/" class="font-medium text-[#073763] hover:text-[#052c50] hover:underline">
+                        Beranda
+                    </a>
+                </p>
             </form>
         </div>
         

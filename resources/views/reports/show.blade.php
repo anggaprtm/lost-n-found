@@ -15,16 +15,20 @@
                     {{ $report->type === 'lost' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' }}">
                     {{ $report->type === 'lost' ? 'Barang Hilang' : 'Barang Temuan' }}
                 </span>
+                    @php
+                        $statusMap = [
+                            'pending' => ['label' => 'Menunggu Validasi', 'class' => 'bg-yellow-100 text-yellow-800'],
+                            'approved' => ['label' => 'Tervalidasi', 'class' => 'bg-blue-100 text-blue-800'],
+                            'rejected' => ['label' => 'Ditolak', 'class' => 'bg-red-100 text-red-800'],
+                            'returned' => ['label' => 'Dikembalikan', 'class' => 'bg-purple-100 text-purple-800'],
+                        ];
+                    @endphp
 
-                <span class="inline-flex px-3 py-1 text-sm font-semibold rounded-full
-                    @switch($report->status)
-                        @case('pending') bg-yellow-100 text-yellow-800 @break
-                        @case('approved') bg-green-100 text-green-800 @break
-                        @case('rejected') bg-red-100 text-red-800 @break
-                        @case('returned') bg-blue-100 text-blue-800 @break
-                    @endswitch">
-                    {{ ucfirst($report->status) }}
-                </span>
+                    <span class="inline-flex px-3 py-1 text-sm font-semibold rounded-full
+                        {{ $statusMap[$report->status]['class'] ?? 'bg-gray-100 text-gray-800' }}">
+                        {{ $statusMap[$report->status]['label'] ?? ucfirst($report->status) }}
+                    </span>
+                    
             </div>
         </div>
 
@@ -135,14 +139,14 @@
                     !$report->claims()->where('user_id', auth()->id())->exists()
                 )
                     <button onclick="openClaimModal()" class="btn-primary">
-                        Klaim Barang Ini
+                        Klaim
                     </button>
                 @endif
                 
                 {{-- Tombol Assign (hanya untuk petugas/admin) --}}
                 @if(in_array(auth()->user()->role, ['petugas', 'admin']) && $report->type === 'found' && $report->status === 'approved')
-                    <a href="{{ route('petugas.reports.assign', $report) }}" class="px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50">
-                        Assign ke Pengguna
+                    <a href="{{ route('petugas.reports.assign', $report) }}" class="btn-primary">
+                        Kembalikan
                     </a>
                 @endif
 

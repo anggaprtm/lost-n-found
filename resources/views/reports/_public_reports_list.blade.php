@@ -1,99 +1,191 @@
-<section id="temuan" class="bg-gray-50 py-16 sm:py-20">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        <div class="text-center mb-12">
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Barang Temuan Terbaru</h2>
-            <p class="mt-4 text-lg text-gray-600">Lihat barang-barang yang telah ditemukan dan diverifikasi oleh petugas kami.</p>
+<section id="temuan" class="bg-gray-50">
+
+    {{-- SECTION HEADER / MINI HERO --}}
+    <div class="relative bg-cover bg-center"
+         style="background-image: url('/images/GKB.jpg');">
+        <div class="absolute inset-0 bg-gradient-to-b
+                    from-[#073763]/90 to-[#741B47]/80"></div>
+
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8
+                    py-16 text-center text-white">
+            <h2 class="text-3xl md:text-4xl font-bold tracking-tight">
+                Barang Hilang & Ditemukan
+            </h2>
+            <p class="mt-4 text-base md:text-lg text-white/90 max-w-3xl mx-auto">
+                Daftar laporan barang
+                <span class="font-semibold text-red-300">kehilangan</span>
+                dan
+                <span class="font-semibold text-green-300">temuan</span>
+                yang telah diverifikasi oleh petugas FTMM.
+            </p>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+        {{-- BACK --}}
+        <div class="mb-6">
+            <a href="/"
+               class="inline-flex items-center gap-2
+                      px-4 py-2 rounded-lg
+                      border border-gray-300
+                      text-sm font-medium text-gray-700
+                      bg-white hover:bg-gray-50 transition">
+                <span class="text-lg">&larr;</span>
+                Kembali ke Beranda
+            </a>
         </div>
 
-        {{-- Filters --}}
-        <div class="bg-white rounded-xl shadow-sm p-4 mb-8 sticky top-0 z-20">
-            <form method="GET" action="{{ url()->current() }}#temuan" class="flex flex-col md:flex-row gap-4 items-center">
-                <div class="w-full md:flex-1">
-                    <label for="search" class="sr-only">Cari barang</label>
-                    <input type="text" name="search" id="search" value="{{ request('search') }}" placeholder="Cari nama barang..." class="form-input w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+        {{-- INFO KLAIM --}}
+        <div class="mb-8 rounded-xl border border-blue-200
+                    bg-blue-50 px-5 py-4 text-sm text-blue-800">
+            <strong>Informasi Klaim:</strong>
+            Barang temuan dapat diklaim dengan
+            <strong>login ke sistem</strong>,
+            atau datang langsung ke
+            <strong>Lt. 10 Ruang Sarpras</strong>. Petugas akan membantu proses klaim Anda.
+        </div>
+
+        {{-- FILTER BAR --}}
+        <div class="bg-white/90 backdrop-blur
+                    rounded-xl shadow-md
+                    p-4 md:p-5 mb-10
+                    sticky top-0 z-20
+                    border border-gray-100">
+
+            <form method="GET"
+                  action="{{ url()->current() }}#temuan"
+                  class="flex flex-col md:flex-row
+                         gap-3 md:gap-4
+                         items-stretch md:items-center">
+
+                {{-- SEARCH --}}
+                <div class="relative w-full md:flex-1">
+                    <span class="absolute inset-y-0 left-0 pl-3
+                                 flex items-center text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             class="w-5 h-5"
+                             fill="none" viewBox="0 0 24 24"
+                             stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M21 21l-6-6m2-5a7 7 0 11-14 0
+                                     7 7 0 0114 0z" />
+                        </svg>
+                    </span>
+
+                    <input type="text"
+                           name="search"
+                           value="{{ request('search') }}"
+                           placeholder="Cari nama barang, lokasi, atau deskripsi..."
+                           class="w-full pl-11 pr-4 py-3
+                                  rounded-lg border border-gray-300
+                                  text-sm shadow-sm
+                                  focus:ring-2 focus:ring-primary
+                                  focus:border-primary">
                 </div>
-                <div class="w-full md:w-auto">
-                    <label for="category" class="sr-only">Kategori</label>
-                    <select name="category" id="category" class="form-select w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+
+                {{-- CATEGORY --}}
+                <div class="relative w-full md:w-56">
+                    <select name="category"
+                            class="w-full appearance-none px-4 py-3 pr-10
+                                   rounded-lg border border-gray-300
+                                   text-sm bg-white shadow-sm
+                                   focus:ring-2 focus:ring-primary
+                                   focus:border-primary">
                         <option value="">Semua Kategori</option>
                         @foreach($categories as $category)
-                            <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                            <option value="{{ $category->id }}"
+                                {{ request('category') == $category->id ? 'selected' : '' }}>
+                                {{ $category->name }}
+                            </option>
                         @endforeach
                     </select>
+
+                    <span class="absolute inset-y-0 right-0 pr-3
+                                 flex items-center text-gray-400 pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             class="w-5 h-5"
+                             fill="none" viewBox="0 0 24 24"
+                             stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </span>
                 </div>
-                <div class="w-full md:w-auto">
-                    <button type="submit" class="btn-primary w-full md:w-auto">Cari</button>
-                </div>
+
+                {{-- SUBMIT --}}
+                <button type="submit"
+                        class="inline-flex items-center justify-center gap-2
+                               px-6 py-3 rounded-lg
+                               bg-primary text-white
+                               text-sm font-semibold
+                               shadow-md hover:shadow-lg
+                               hover:bg-primary/90 transition">
+                    Cari
+                </button>
             </form>
         </div>
 
-        {{-- Card Grid --}}
-        @if($reports->count() > 0)
-            {{-- Ubah ke lg:grid-cols-4 agar card lebih kecil dan muat banyak --}}
+        {{-- LOADING SKELETON --}}
+        <template id="skeleton-template">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                @foreach($reports as $report)
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden group hover:shadow-xl transition-all duration-300 border border-gray-100">
-                        <a href="{{ route('reports.show', $report) }}" class="block relative">
-                            {{-- Container Gambar dengan Tinggi Tetap (Fixed Height) --}}
-                            <div class="h-48 w-full bg-gray-100 overflow-hidden">
-                                @if($report->photo)
-                                    {{-- object-cover wajib ada agar gambar tidak gepeng --}}
-                                    <img src="{{ Storage::url($report->photo) }}" 
-                                        alt="{{ $report->item_name }}" 
-                                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                                        onerror="this.onerror=null; this.src='https://placehold.co/600x400?text=Image+Not+Found'">
-                                @else
-                                    <div class="w-full h-full flex items-center justify-center bg-gray-200">
-                                        <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                    </div>
-                                @endif
-                                
-                                {{-- Opsional: Badge Tanggal di atas gambar agar hemat tempat --}}
-                                <div class="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-semibold text-gray-600 shadow-sm">
-                                    {{ $report->event_date->format('d M Y') }}
-                                </div>
-                            </div>
-                        </a>
-
-                        <div class="p-4"> {{-- Padding dikurangi jadi p-4 --}}
-                            {{-- Judul dengan line-clamp-1 (maks 1 baris) --}}
-                            <h3 class="text-lg font-bold text-gray-900 line-clamp-1 group-hover:text-primary transition-colors" title="{{ $report->item_name }}">
-                                <a href="{{ route('reports.show', $report) }}">{{ $report->item_name }}</a>
-                            </h3>
-
-                            {{-- Deskripsi dengan line-clamp-2 (maks 2 baris) --}}
-                            <p class="text-sm text-gray-600 mt-2 line-clamp-2 h-10 leading-tight">
-                                {{ $report->description }}
-                            </p>
-
-                            <div class="mt-4 flex items-center justify-between border-t pt-3 border-gray-100">
-                                <span class="text-xs text-gray-400">ID: #{{ $report->id }}</span>
-                                <a href="{{ route('reports.show', $report) }}" class="text-sm font-medium text-primary hover:text-blue-700 transition-colors flex items-center gap-1">
-                                    Lihat
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                                </a>
-                            </div>
-                        </div>
+                @for ($i = 0; $i < 8; $i++)
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden animate-pulse">
+                    <div class="h-48 bg-gray-200"></div>
+                    <div class="p-4 space-y-3">
+                        <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+                        <div class="h-3 bg-gray-200 rounded w-full"></div>
+                        <div class="h-3 bg-gray-200 rounded w-5/6"></div>
+                        <div class="h-3 bg-gray-200 rounded w-1/3 mt-4"></div>
                     </div>
-                @endforeach
-            </div>
-        @else
-            {{-- Empty State (Tetap sama) --}}
-            <div class="text-center py-12 px-6 bg-white rounded-xl shadow-sm border border-gray-100">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-50 mb-4">
-                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </div>
-                <h3 class="text-lg font-semibold text-gray-800">Tidak Ada Barang Ditemukan</h3>
-                <p class="text-sm text-gray-500 mt-1">Coba kata kunci atau filter lain.</p>
+                @endfor
             </div>
-        @endif
+        </template>
 
-        {{-- Pagination --}}
+
+        <div id="report-grid">
+            @include('reports._cards', ['reports' => $reports])
+        </div>
+
+        {{-- PAGINATION --}}
         @if ($reports->hasPages())
-            <div class="mt-8">
+            <div class="mt-10 flex justify-center">
                 {{ $reports->withQueryString()->links() }}
             </div>
         @endif
+        </div>
     </div>
 </section>
+
+<script>
+let delay;
+const searchInput = document.querySelector('input[name="search"]');
+const categorySelect = document.querySelector('select[name="category"]');
+const grid = document.getElementById('report-grid');
+const skeleton = document.getElementById('skeleton-template').innerHTML;
+
+function liveSearch() {
+    clearTimeout(delay);
+
+    delay = setTimeout(() => {
+        // tampilkan skeleton
+        grid.innerHTML = skeleton;
+
+        const params = new URLSearchParams({
+            search: searchInput.value,
+            category: categorySelect.value
+        });
+
+        fetch(`{{ route('temuan.search') }}?${params}`)
+            .then(res => res.text())
+            .then(html => {
+                grid.innerHTML = html;
+            });
+    }, 400);
+}
+
+searchInput.addEventListener('input', liveSearch);
+categorySelect.addEventListener('change', liveSearch);
+</script>
+

@@ -78,8 +78,39 @@ class ReportController extends Controller
         $buildings = Building::all();
 
         // Mengarah ke file view baru yang akan kita buat
-        return view('reports.public_index', compact('reports', 'categories', 'buildings'));
+        return view('temuan', compact('reports', 'categories', 'buildings'));
     }
+
+    public function publicSearch(Request $request)
+    {
+        $query = Report::with(['room.building', 'category'])
+            ->where('status', 'approved');
+
+        // search
+        if ($request->filled('search')) {
+            $q = $request->search;
+            $query->where(function ($sub) use ($q) {
+                $sub->where('item_name', 'like', "%{$q}%")
+                    ->orWhere('description', 'like', "%{$q}%");
+            });
+        }
+
+        // category
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->category);
+        }
+
+        $reports = $query->latest()->take(12)->get();
+
+        $search = $request->search;
+
+        
+        return view('reports._cards', [
+            'reports' => $reports,
+            'highlight' => $search
+        ])->render();
+    }
+
 
     // =================================================
     // == FUNGSI UNTUK PENGGUNA (ROLE: PENGGUNA) ==

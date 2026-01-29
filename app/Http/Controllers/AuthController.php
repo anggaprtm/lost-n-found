@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -10,9 +11,59 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    public function showLogin()
+    /**
+     * Display the registration view.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function showRegistrationForm()
     {
+        if (auth()->check()) {
+            return redirect()->route('dashboard');
+        }
+        return view('auth.register');
+    }
+
+   public function showLoginForm()
+    {
+        if (auth()->check()) {
+            return redirect()->route('dashboard');
+        }
+
         return view('auth.login');
+    }
+
+
+
+    /**
+     * Handle a registration request for the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'nim' => ['required', 'string', 'max:255', 'unique:users'],
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'nim' => $request->nim,
+            'role' => 'pengguna', // Default role for registration
+        ]);
+
+        // Log the user in
+        auth()->login($user);
+
+        // Redirect to a dashboard or home page
+        return redirect('/dashboard');
+        
     }
 
     public function login(Request $request)
@@ -79,4 +130,5 @@ class AuthController extends Controller
         
         return redirect('/');
     }
+
 }

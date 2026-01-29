@@ -164,7 +164,7 @@
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Tipe</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Tanggal</th>
-                        <th class="relative px-4 py-3"></th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 bg-white">
@@ -173,26 +173,42 @@
                         <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ \Illuminate\Support\Str::limit($report->item_name, 30) }}</td>
                         <td class="px-4 py-3 text-sm text-gray-500">{{ $report->user->name }}</td>
                         <td class="px-4 py-3">
-                            <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                {{ $report->type == 'lost' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' }}">
-                                {{ ucfirst($report->type) }}
+                            @php
+                                $typeMap = [
+                                    'lost' => [
+                                        'label' => 'Laporan Kehilangan',
+                                        'class' => 'bg-red-100 text-red-800',
+                                    ],
+                                    'found' => [
+                                        'label' => 'Temuan',
+                                        'class' => 'bg-green-100 text-green-800',
+                                    ],
+                                ];
+                            @endphp
+
+                            <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full
+                                {{ $typeMap[$report->type]['class'] ?? 'bg-gray-100 text-gray-800' }}">
+                                {{ $typeMap[$report->type]['label'] ?? ucfirst($report->type) }}
                             </span>
                         </td>
                         <td class="px-4 py-3">
-                            <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                @switch($report->status)
-                                    @case('pending') bg-yellow-100 text-yellow-800 @break
-                                    @case('approved') bg-blue-100 text-blue-800 @break
-                                    @case('rejected') bg-red-100 text-red-800 @break
-                                    @case('returned') bg-purple-100 text-purple-800 @break
-                                @endswitch
-                            ">
-                                {{ ucfirst($report->status) }}
-                            </span>
+                            @php
+                                    $statusMap = [
+                                        'pending' => ['label' => 'Menunggu Validasi', 'class' => 'bg-yellow-100 text-yellow-800'],
+                                        'approved' => ['label' => 'Tervalidasi', 'class' => 'bg-blue-100 text-blue-800'],
+                                        'rejected' => ['label' => 'Ditolak', 'class' => 'bg-red-100 text-red-800'],
+                                        'returned' => ['label' => 'Dikembalikan', 'class' => 'bg-purple-100 text-purple-800'],
+                                    ];
+                                @endphp
+
+                                <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full
+                                    {{ $statusMap[$report->status]['class'] ?? 'bg-gray-100 text-gray-800' }}">
+                                    {{ $statusMap[$report->status]['label'] ?? ucfirst($report->status) }}
+                                </span>
                         </td>
                         <td class="px-4 py-3 text-sm text-gray-500">{{ $report->created_at->format('d M Y') }}</td>
-                        <td class="px-4 py-3 text-right text-sm font-medium">
-                            <a href="{{ route('admin.reports.show', $report) }}" class="text-indigo-600 hover:text-indigo-900">Detail</a>
+                        <td class="px-4 py-3 text-sm text-gray-500">
+                            <a href="{{ route('admin.reports.show', $report) }}" class="text-indigo-600 hover:text-indigo-900 bg-indigo-100 hover:bg-indigo-200 px-3 py-1 rounded-md transition-colors">Detail</a>
                         </td>
                     </tr>
                     @empty

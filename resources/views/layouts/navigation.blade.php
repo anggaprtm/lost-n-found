@@ -12,7 +12,6 @@
                         {{-- Menu untuk Pengguna --}}
                         <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">Dashboard</a>
                         <a href="{{ route('reports.public_index') }}" class="nav-link {{ request()->routeIs('reports.public_index') ? 'active' : '' }}">Barang Temuan</a>
-                        {{-- PERBAIKI INI: Buat kondisi routeIs lebih spesifik --}}
                         <a href="{{ route('reports.index') }}" class="nav-link {{ request()->routeIs(['reports.index', 'reports.create', 'reports.show', 'reports.edit']) ? 'active' : '' }}">Laporan Saya</a>
                         
                         <a href="{{ route('claims.index') }}" class="nav-link {{ request()->routeIs('claims.*') ? 'active' : '' }}">Claim Saya</a>

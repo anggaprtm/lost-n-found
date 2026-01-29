@@ -98,7 +98,7 @@
 
             <div class="flex justify-end space-x-4 mt-6">
                 <a href="{{ Auth::user()->isAdmin() ? route('admin.reports.validation') : route('petugas.reports') }}" class="btn-outline">
-                    Batals
+                    Batal
                 </a>
                 <button type="submit" class="btn-primary">
                     Simpan Perubahan

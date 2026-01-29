@@ -12,7 +12,7 @@
         </div>
         <div class="mt-4 md:mt-0">
             <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-50 text-primary border border-blue-100">
-                {{ auth()->user()->role === 'mahasiswa' ? 'Civitas Academica' : ucfirst(auth()->user()->role) }}
+                {{ auth()->user()->role === 'mahasiswa' ? 'Sivitas Akademika' : ucfirst(auth()->user()->role) }}
             </span>
         </div>
     </div>
