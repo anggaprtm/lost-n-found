@@ -121,13 +121,19 @@ class ReportController extends Controller
             $query->where('category_id', $request->category);
         }
 
-        $reports = $query->latest()->take(12)->get();
+        $reports = $query
+            ->latest()
+            ->paginate(12)
+            ->withQueryString();
 
-        return view('reports._cards', [
-            'reports'   => $reports,
-            'highlight' => $request->search
-        ])->render();
+        return response()->json([
+            'html' => view('reports._cards', [
+                'reports'   => $reports,
+                'highlight' => $request->search
+            ])->render()
+        ]);
     }
+
 
 
 

@@ -18,7 +18,7 @@
 
     <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
         <div class="bg-gradient-to-r from-[#073763] to-[#073763] px-6 py-8">
-            <h1 class="text-2xl font-bold text-white">Assign Claim untuk Barang Temuan</h1>
+            <h1 class="text-2xl font-bold text-white">Assign Klaim untuk Barang Temuan</h1>
             <p class="text-[#C0C0C0] mt-2">Detail barang yang akan di-assign.</p>
         </div>
 
@@ -31,7 +31,14 @@
                         @if($report->photo)
                             <img src="{{ asset('storage/' . $report->photo) }}" alt="Foto Barang" class="w-full h-auto object-cover rounded-lg shadow-md">
                         @else
-                            <img src="{{ asset('placeholder.jpg') }}" alt="Tidak ada foto" class="w-full h-auto object-cover rounded-lg shadow-md">
+                            <div class="w-full h-64 bg-gray-100 rounded-lg flex flex-col items-center justify-center  border">
+                                <svg class="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                    </path>
+                                </svg>
+                                <span class="text-gray-500 text-sm font-medium">Tidak ada foto</span>
+                            </div>
                         @endif
                     </div>
                     <div class="md:col-span-2 space-y-3">
@@ -68,21 +75,39 @@
                     </fieldset>
 
                     {{-- Existing User Selection --}}
-                    <div x-show="assign_type === 'existing'" x-transition>
-                        <label for="user_id" class="block text-sm font-medium text-gray-700 mb-2">Nama Pengguna (Mahasiswa)</label>
-                        <select class="form-select w-full border-[#073763] focus:ring-[#073763] rounded-md shadow-sm @error('user_id') border-red-500 @enderror" 
-                                id="user_id" name="user_id" x-bind:required="assign_type === 'existing'">
-                            <option value="">-- Pilih Pengguna --</option>
+                    <div
+                        x-show="assign_type === 'existing'"
+                        x-transition
+                        x-cloak
+                    >
+                        <label for="user_id"
+                            class="block mb-2 text-sm font-medium text-gray-700">
+                            Nama Pengguna (Mahasiswa)
+                        </label>
+
+                        <select
+                            id="user_id"
+                            name="user_id"
+                            x-bind:required="assign_type === 'existing'"
+                            class="block w-full rounded-md px-3 py-2 text-sm
+                                border border-[#073763]
+                                focus:outline-none focus:ring-2 focus:ring-[#073763] focus:border-[#073763]
+                                shadow-sm
+                                @error('user_id') border-red-500 focus:ring-red-500 focus:border-red-500 @enderror"
+                        >
+                            <option value="">— Pilih Pengguna —</option>
                             @foreach($users as $user)
                                 <option value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'selected' : '' }}>
                                     {{ $user->name }} ({{ $user->email }})
                                 </option>
                             @endforeach
                         </select>
+
                         @error('user_id')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
+
 
                     {{-- Manual User Input --}}
                     <div x-show="assign_type === 'manual'" x-transition class="space-y-4">
@@ -123,9 +148,20 @@
                         </div>
                     </div>
 
-                    <div class="flex justify-end space-x-4">
-                        <a href="{{ route('petugas.reports.show', $report) }}" class="btn-outline border-[#741847] text-[#741847] hover:bg-[#741847] hover:text-white">Batal</a>
-                        <button type="submit" class="btn-primary bg-[#741847] hover:bg-[#5b132f]">Assign Claim</button>
+                    <div class="flex justify-end gap-4">
+                        <a href="{{ route('petugas.reports.show', $report) }}"
+                        class="inline-flex items-center justify-center px-5 py-2.5 rounded-md
+                                border border-[#741847] text-[#741847] font-medium
+                                hover:bg-[#741847] hover:text-white transition">
+                            Batal
+                        </a>
+
+                        <button type="submit"
+                                class="inline-flex items-center justify-center px-5 py-2.5 rounded-md
+                                    bg-[#741847] text-white font-medium
+                                    hover:bg-[#5b132f] transition">
+                            Assign Klaim
+                        </button>
                     </div>
                 </form>
             </div>

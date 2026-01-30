@@ -8,6 +8,7 @@
     <title>@yield('title', config('app.name', 'Lost & Found'))</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -98,11 +99,25 @@
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
                                 <a href="@if(Auth::user()->role == 'admin') {{ route('admin.dashboard') }} @elseif(Auth::user()->role == 'petugas') {{ route('petugas.dashboard') }} @else {{ route('dashboard') }} @endif" 
-                                   class="flex items-center gap-2 text-[#741B47] text-xl font-bold hover:text-[#5f163a] transition-colors">
-                                    <svg class="w-7 h-7 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                    </svg>
-                                    Lost & Found
+                                class="flex items-center gap-3 group">
+                                    <div class="flex items-center justify-center w-10 h-10 bg-[#741847] rounded-lg 
+                                                transition-all duration-300 ease-in-out
+                                                group-hover:bg-white group-hover:ring-2 group-hover:ring-[#741847] group-hover:scale-110">
+                                        <svg class="w-6 h-6 text-white transition-colors duration-300
+                                                    group-hover:text-[#741847]"
+                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-[#741847] font-bold text-xl leading-tight 
+                                                    transition-colors duration-300
+                                                    group-hover:text-[#9b1d5a]">Lost & Found</span>
+                                        <span class="text-gray-600 text-xs 
+                                                    transition-colors duration-300
+                                                    group-hover:text-gray-800">Portal Barang Hilang FTMM</span>
+                                    </div>
                                 </a>
                             </div>
                             
@@ -250,12 +265,25 @@
                     <div class="flex items-center justify-between h-20">
 
                         {{-- LOGO KIRI --}}
-                        <a href="/" class="flex items-center gap-2 text-[#741847] font-bold text-xl">
-                            <svg class="w-7 h-7 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                            <span>Lost & Found</span>
+                        <a href="/" class="flex items-center gap-3 group">
+                            <div class="flex items-center justify-center w-10 h-10 bg-[#741847] rounded-lg 
+                                        transition-all duration-300 ease-in-out
+                                        group-hover:bg-white group-hover:ring-2 group-hover:ring-[#741847] group-hover:scale-110">
+                                <svg class="w-6 h-6 text-white transition-colors duration-300
+                                            group-hover:text-[#741847]" 
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-[#741847] font-bold text-xl leading-tight 
+                                            transition-colors duration-300
+                                            group-hover:text-[#9b1d5a]">Lost & Found</span>
+                                <span class="text-gray-600 text-xs 
+                                            transition-colors duration-300
+                                            group-hover:text-gray-800">Portal Barang Hilang FTMM</span>
+                            </div>
                         </a>
 
                         {{-- TOMBOL LOGIN KANAN --}}
@@ -309,23 +337,34 @@
             <div class="max-w-7xl mx-auto px-6 py-6">
                 <div class="flex flex-col md:flex-row items-center justify-between gap-4">
                     
-                    <div class="flex items-center gap-2">
-                        <svg class="w-7 h-7 text-yellow-500"
-                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                        </svg>
-                        <span class="text-lg font-semibold text-slate-800">
-                            Lost & Found
-                        </span>
+                    <!-- Logo dengan hover effect -->
+                    <div class="flex items-center gap-3 group cursor-pointer">
+                        <div class="flex items-center justify-center w-10 h-10 bg-[#741847] rounded-lg 
+                                    transition-all duration-300 ease-in-out
+                                    group-hover:bg-white group-hover:ring-2 group-hover:ring-[#741847] group-hover:scale-110">
+                            <svg class="w-6 h-6 text-white transition-colors duration-300
+                                        group-hover:text-[#741847]"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[#741847] font-bold text-lg leading-tight 
+                                        transition-colors duration-300
+                                        group-hover:text-[#9b1d5a]">Lost & Found</span>
+                            <span class="text-gray-600 text-xs 
+                                        transition-colors duration-300
+                                        group-hover:text-gray-800">Portal Barang Hilang FTMM</span>
+                        </div>
                     </div>
 
+                    <!-- Copyright text -->
                     <p class="text-xs text-slate-600 text-center md:text-right leading-relaxed">
                         Lost & Found<br>
                         Fakultas Teknologi Maju dan Multidisiplin<br>
-                        Universitas Airlangga © {{ date('Y') }}
+                        USI FTMM © {{ date('Y') }}
                     </p>
-
                 </div>
             </div>
         </footer>

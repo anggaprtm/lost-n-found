@@ -8,11 +8,11 @@
 
     {{-- BACKGROUND IMAGE --}}
     <div class="absolute inset-0">
-        <img src="/images/GKB.jpg"
+        <img src="/images/GKB.JPG"
              alt="FTMM"
              class="w-full h-full object-cover">
         <div class="absolute inset-0 bg-gradient-to-b
-                    from-[#073763]/90
+                    from-[#741B47]/70
                     via-[#073763]/70
                     to-[#741B47]/80">
         </div>
@@ -20,7 +20,7 @@
 
     {{-- HERO CONTENT --}}
     <div class="relative z-10 max-w-7xl mx-auto px-6
-                pt-40 pb-56 text-center text-white">
+                pt-[70px] pb-[200px] text-center text-white">
 
         <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight">
             FTMM Lost & Found
@@ -170,32 +170,53 @@ document.addEventListener('DOMContentLoaded', () => {
         reportGrid.innerHTML = template.repeat(8);
     }
 
-    function fetchResults() {
+    function fetchResults(url = null) {
         const search   = searchInput.value;
         const category = categoryInput.value;
 
         showSkeleton();
 
-        fetch(`{{ route('temuan.search') }}?search=${encodeURIComponent(search)}&category=${category}`, {
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        let fetchUrl = url ??
+            `{{ route('temuan.search') }}?search=${encodeURIComponent(search)}&category=${category}`;
+
+        fetch(fetchUrl, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
         })
-        .then(res => res.text())
-        .then(html => {
-            reportGrid.innerHTML = html;
+        .then(res => res.json())
+        .then(data => {
+            reportGrid.innerHTML = data.html;
+            bindPagination(); // ⬅️ PENTING
         })
         .catch(() => {
-            reportGrid.innerHTML = `<p class="col-span-full text-center text-sm text-gray-500">Gagal memuat data.</p>`;
+            reportGrid.innerHTML = `
+                <p class="col-span-full text-center text-sm text-gray-500">
+                    Gagal memuat data.
+                </p>
+            `;
         });
     }
 
-
     function debounceFetch() {
         clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(fetchResults, 400); // ⏱️ debounce 400ms
+        debounceTimer = setTimeout(() => fetchResults(), 400);
+    }
+
+    function bindPagination() {
+        reportGrid.querySelectorAll('a[href*="page="]').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                fetchResults(link.href);
+            });
+        });
     }
 
     searchInput.addEventListener('input', debounceFetch);
-    categoryInput.addEventListener('change', fetchResults);
+    categoryInput.addEventListener('change', () => fetchResults());
+
+    // initial bind (kalau halaman pertama sudah ada pagination)
+    bindPagination();
 });
 </script>
-

@@ -161,7 +161,7 @@
     <div class="hidden lg:block lg:w-[65%] relative">
         {{-- Background Image --}}
         <div class="absolute inset-0">
-            <img src="/images/GKB.jpg" 
+            <img src="/images/GKB.JPG" 
                  class="w-full h-full object-cover" 
                  alt="FTMM Gedung">
             

@@ -17,13 +17,30 @@
 
     <!-- Filters -->
     <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
-        <form method="GET" class="flex flex-wrap gap-4">
-            <div class="flex-1 min-w-64">
-                <input type="text" name="search" value="{{ request('search') }}" 
-                       placeholder="Cari nama barang atau deskripsi..." class="form-input">
+        <form method="GET" class="flex flex-wrap items-end gap-4">
+
+            <!-- Search -->
+            <div class="flex-1 min-w-[260px]">
+                <label class="sr-only">Pencarian</label>
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ request('search') }}"
+                    placeholder="Cari nama barang atau deskripsi…"
+                    class="w-full px-4 py-2.5 text-sm rounded-md
+                        border border-gray-300
+                        focus:outline-none focus:ring-2 focus:ring-[#073763] focus:border-[#073763]"
+                >
             </div>
-            <div>
-                <select name="status" class="form-select">
+
+            <!-- Status -->
+            <div class="min-w-[160px]">
+                <select
+                    name="status"
+                    class="w-full px-3 py-2.5 text-sm rounded-md
+                        border border-gray-300
+                        focus:outline-none focus:ring-2 focus:ring-[#073763] focus:border-[#073763]"
+                >
                     <option value="">Semua Status</option>
                     <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
                     <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Disetujui</option>
@@ -31,17 +48,44 @@
                     <option value="returned" {{ request('status') === 'returned' ? 'selected' : '' }}>Dikembalikan</option>
                 </select>
             </div>
-            <div>
-                <select name="type" class="form-select">
+
+            <!-- Type -->
+            <div class="min-w-[150px]">
+                <select
+                    name="type"
+                    class="w-full px-3 py-2.5 text-sm rounded-md
+                        border border-gray-300
+                        focus:outline-none focus:ring-2 focus:ring-[#073763] focus:border-[#073763]"
+                >
                     <option value="">Semua Tipe</option>
                     <option value="lost" {{ request('type') === 'lost' ? 'selected' : '' }}>Hilang</option>
                     <option value="found" {{ request('type') === 'found' ? 'selected' : '' }}>Temuan</option>
                 </select>
             </div>
-            <button type="submit" class="btn-primary">Filter</button>
-            <a href="{{ route('reports.index') }}" class="btn-primary">Reset</a>
+
+            <!-- Actions -->
+            <div class="flex gap-2">
+                <button
+                    type="submit"
+                    class="px-5 py-2.5 rounded-md text-sm font-medium
+                        bg-[#073763] text-white hover:bg-[#052b4d] transition"
+                >
+                    Filter
+                </button>
+
+                <a
+                    href="{{ route('reports.index') }}"
+                    class="px-5 py-2.5 rounded-md text-sm font-medium
+                        border border-gray-300 text-gray-600
+                        hover:bg-gray-100 transition"
+                >
+                    Reset
+                </a>
+            </div>
+
         </form>
     </div>
+
 
     <!-- Reports List -->
     <div class="bg-white rounded-xl shadow-sm overflow-hidden">
