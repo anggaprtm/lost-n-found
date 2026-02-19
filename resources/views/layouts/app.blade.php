@@ -287,7 +287,7 @@
                         </a>
 
                         {{-- TOMBOL LOGIN KANAN --}}
-                        <a href="{{ route('login') }}"
+                        <!-- <a href="{{ route('login') }}"
                         class="inline-flex items-center gap-2
                                 px-6 py-2.5 rounded-full
                                 bg-[#741B47] text-white
@@ -299,7 +299,7 @@
 
                             <i class="fas fa-sign-in-alt me-1"></i>
                             Login
-                        </a>
+                        </a> -->
 
 
                     </div>

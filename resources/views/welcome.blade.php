@@ -27,11 +27,10 @@
         </h1>
 
         <p class="mt-4 text-base md:text-lg text-gray-200 max-w-2xl mx-auto">
-            Temukan kembali barang yang hilang atau laporkan barang temuan
-            di lingkungan Fakultas Teknologi Maju dan Multidisiplin.
+            Temukan kembali barang yang hilang di lingkungan Fakultas Teknologi Maju dan Multidisiplin.
         </p>
 
-        <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+        <!-- <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
 
             {{-- GLASS BUTTON PRIMARY --}}
             <a href="#lost-found"
@@ -63,7 +62,7 @@
                 Buat Laporan
             </a>
 
-        </div>
+        </div> -->
 
     </div>
 
