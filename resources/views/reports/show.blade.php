@@ -125,31 +125,14 @@
 
                 {{-- TOMBOL KEMBALI --}}
                 <a href="{{ url()->previous() }}" class="btn-primary">Kembali</a>
-
-                {{-- TOMBOL KLAIM --}}
-                @php
-                    $viewer = auth()->user();
-                    $viewerIsOwner = $viewer->id === $report->user_id;
-                    $ownerIsStaff = in_array($report->user->role, ['admin','petugas']);
-                @endphp
-
-                @if(
-                    $report->type === 'found' &&
-                    $report->status === 'approved' &&
-                    (!$viewerIsOwner || $ownerIsStaff) &&
-                    !$report->claims()->where('user_id', auth()->id())->exists()
-                )
-                    <button onclick="openClaimModal()" class="btn-primary">
-                        Klaim
-                    </button>
-                @endif
                 
-                {{-- Tombol Assign (hanya untuk petugas/admin) --}}
-                @if(in_array(auth()->user()->role, ['petugas', 'admin']) && $report->type === 'found' && $report->status === 'approved')
-                    <a href="{{ route('petugas.reports.assign', $report) }}" class="btn-primary">
-                        Kembalikan
-                    </a>
-                @endif
+                @auth
+                    @if(in_array(auth()->user()->role, ['petugas', 'admin']) && $report->type === 'found' && $report->status === 'approved')
+                        <a href="{{ route('petugas.reports.assign', $report) }}" class="btn-primary">
+                            Kembalikan
+                        </a>
+                    @endif
+                @endauth
 
             </div>
 

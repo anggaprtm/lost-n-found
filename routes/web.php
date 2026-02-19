@@ -16,8 +16,9 @@ use App\Http\Controllers\UserController;
 // == LANDING PAGE ==
 Route::get('/', [ReportController::class, 'publicIndex'])->name('landing');
 Route::get('/reports/public', [ReportController::class, 'publicReportIndex'])->name('report.public_index');
-Route::get('/temuan/search', [ReportController::class, 'publicSearch'])
-    ->name('temuan.search');
+Route::get('/temuan/search', [ReportController::class, 'publicSearch'])->name('temuan.search');
+Route::get('/reports/{report}', [ReportController::class, 'show'])->name('reports.show'); // ✅ Taruh di sini, HAPUS duplikat yang lain
+
 // == AUTH ==
 // == AUTH ==
 Route::get('/login', [AuthController::class, 'showLoginForm'])
@@ -37,7 +38,7 @@ Route::post('/register', [AuthController::class, 'register'])
 // == AUTHENTICATED ROUTES ==
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::resource('reports', ReportController::class)->except(['destroy']);
+    Route::resource('reports', ReportController::class)->except(['destroy', 'show']); // ✅ tambah 'show' di except
 
     // == PROFILE (SHARED BY ALL ROLES) ==
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');

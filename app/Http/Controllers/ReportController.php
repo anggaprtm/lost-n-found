@@ -268,9 +268,9 @@ class ReportController extends Controller
      */
     public function show(Report $report)
     {
-        if (!in_array(Auth::user()->role, ['admin', 'petugas'])) {
-            $this->authorize('view', $report);
-        }
+        // if (!in_array(Auth::user()->role, ['admin', 'petugas'])) {
+        //     $this->authorize('view', $report);
+        // }
 
         $report->load(['user', 'room.building', 'category', 'validator', 'claims.user']);
         return view('reports.show', compact('report'));

@@ -87,18 +87,10 @@ function highlight($text, $word) {
 
         <div class="mt-4 flex justify-between items-center border-t pt-3 text-sm">
             <span class="text-xs text-gray-400">ID: #{{ $report->id }}</span>
-
-            @if(!auth()->check() && $report->type === 'found')
-                <a href="{{ route('login') }}"
-                   class="font-semibold text-blue-600 hover:text-blue-700">
-                    Login untuk Klaim →
-                </a>
-            @else
                 <a href="{{ route('reports.show', $report) }}"
                    class="font-medium text-primary hover:text-blue-700">
                     Lihat →
                 </a>
-            @endif
         </div>
     </div>
 </div>

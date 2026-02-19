@@ -265,7 +265,7 @@ class PetugasController extends Controller
 
     public function showReport(Report $report)
     {
-        $this->authorize('view', $report);
+        // $this->authorize('view', $report);
         $report->load(['user', 'room.building', 'category', 'validator', 'claims.user']);
         return view('reports.show', compact('report'));
     }
