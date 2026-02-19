@@ -80,11 +80,9 @@
                             bg-blue-50 border border-blue-200
                             px-5 py-4 text-sm text-blue-800">
                     <strong>Informasi Klaim:</strong>
-                    Barang temuan dapat diklaim dengan
-                    <strong>login ke sistem</strong>,
-                    atau datang langsung ke
-                    <strong>Lt. 10 Ruang Sarpras</strong>.
-                    Petugas akan membantu proses klaim Anda.
+                    Anda dapat datang langsung ke
+                    <strong>Lt. 10 Ruang Sarpras FTMM</strong>.
+                    Untuk melakukan proses klaim dan pengambilan barang Anda.
                 </div>
 
                 {{-- FILTER --}}

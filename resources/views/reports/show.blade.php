@@ -101,6 +101,16 @@
                 <p class="text-gray-800 leading-relaxed">{{ $report->description }}</p>
             </div>
 
+            {{-- INFO KLAIM --}}
+            <div class="mb-6 rounded-xl
+                        bg-blue-50 border border-blue-200
+                        px-5 py-4 text-sm text-blue-800">
+                <strong>Informasi Klaim:</strong>
+                Anda dapat datang langsung ke
+                <strong>Lt. 10 Ruang Sarpras FTMM</strong>.
+                Untuk melakukan proses klaim dan pengambilan barang Anda.
+            </div>
+
             {{-- LIST KLAIM (hanya untuk pelapor) --}}
             @if(auth()->id() === $report->user_id && $report->claims->count() > 0)
                 <div class="bg-gray-50 rounded-xl p-6 mb-6 border border-gray-200">
